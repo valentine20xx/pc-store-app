@@ -1,0 +1,48 @@
+{
+  "properties": [
+    {
+      "name": "app.archiver.scheduling.enable",
+      "type": "java.lang.Boolean",
+      "description": "Enable archiver scheduling.",
+      "defaultValue": false
+    },
+    {
+      "name": "app.archiver.scheduling.cron",
+      "type": "java.lang.String",
+      "description": "Archiver cron. (Additional info at https://crontab.guru/examples.html)",
+      "defaultValue": "0 0 * * * *"
+    }
+  ],
+  "hints": [
+    {
+      "name": "app.archiver.scheduling.enable",
+      "values": [
+        {
+          "value": "true",
+          "description": "Disable archiving."
+        },
+        {
+          "value": "false",
+          "description": "Enable archiving."
+        }
+      ]
+    },
+    {
+      "name": "app.archiver.scheduling.cron",
+      "values": [
+        {
+          "value": "0 */5 * * * *",
+          "description": "At every 5th minute (for testing)."
+        },
+        {
+          "value": "0 0 0 * * MON",
+          "description": "At 00:00 on Monday."
+        },
+        {
+          "value": "0 0 0 1 * *",
+          "description": "At 00:00 on day-of-month 1."
+        }
+      ]
+    }
+  ]
+}

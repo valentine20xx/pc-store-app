@@ -1,0 +1,14 @@
+# Code Recommenders
+target/
+
+# Idea
+.idea
+**.iml
+
+# H2 database file
+**.mv.db
+**.trace.db
+logs/
+
+# Keystore file
+src/main/resources/keystore/**

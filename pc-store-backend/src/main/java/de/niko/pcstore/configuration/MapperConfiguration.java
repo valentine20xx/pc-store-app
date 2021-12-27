@@ -1,0 +1,95 @@
+package de.niko.pcstore.configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.niko.pcstore.dto.InternalOrderDTO;
+import de.niko.pcstore.dto.InternalOrderFileDTO;
+import de.niko.pcstore.dto.InternalOrderShortDTO;
+import de.niko.pcstore.entity.ClientDataEntity;
+import de.niko.pcstore.entity.InternalOrderEntity;
+import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
+import de.niko.pcstore.entity.PersonalComputerEntity;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
+
+@Slf4j
+@Configuration
+public class MapperConfiguration {
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.registerModule(new JavaTimeModule());
+
+        return objectMapper;
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+
+        PropertyMap<InternalOrderEntity, InternalOrderDTO> convertPersonalComputerEntity2PersonalComputerDTO = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderFileDTO>> converter = context -> {
+                    Set<InternalOrderFileMetadataEntity> source = context.getSource();
+
+                    return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).notes(personalComputerFileMetadataEntity.getNotes()).build()).collect(Collectors.toList());
+                };
+
+                using(converter).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
+            }
+        };
+
+        PropertyMap<InternalOrderDTO, InternalOrderEntity> convertPersonalComputerDTO2PersonalComputerEntity = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                Converter<List<InternalOrderFileDTO>, Set<InternalOrderFileMetadataEntity>> converter = context -> {
+                    List<InternalOrderFileDTO> source = context.getSource();
+
+                    return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).version(personalComputerFileDTO.getVersion()).name(personalComputerFileDTO.getName()).notes(personalComputerFileDTO.getNotes()).build()).collect(Collectors.toSet());
+                };
+
+                using(converter).map(source.getInternalOrderFiles(), destination.getInternalOrderFileMetadataEntities());
+            }
+        };
+
+        PropertyMap<InternalOrderEntity, InternalOrderShortDTO> convertPersonalComputerEntity2PersonalComputerShortDTO = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                Converter<InternalOrderEntity, String> converter = context -> {
+                    InternalOrderEntity internalOrderEntity = context.getSource();
+                    PersonalComputerEntity personalComputer = internalOrderEntity.getPersonalComputer();
+
+                    String processor = personalComputer.getProcessor();
+                    String graphicsCard = personalComputer.getGraphicsCard();
+
+                    ClientDataEntity clientDataEntity = internalOrderEntity.getClientData();
+
+                    String name = clientDataEntity.getName();
+                    String surname = clientDataEntity.getSurname();
+
+                    return "[" + surname + ", " + name + "][" + processor + "/" + graphicsCard + "]";
+                };
+
+                using(converter).map(source, destination.getDescription());
+            }
+        };
+
+        modelMapper.addMappings(convertPersonalComputerEntity2PersonalComputerDTO);
+        modelMapper.addMappings(convertPersonalComputerDTO2PersonalComputerEntity);
+
+        modelMapper.addMappings(convertPersonalComputerEntity2PersonalComputerShortDTO);
+
+        return modelMapper;
+    }
+}

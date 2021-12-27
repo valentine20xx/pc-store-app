@@ -1,0 +1,3 @@
+# Doc
+
+privacyPolicy = Datenschutzbestimmungen zugestimmt ?

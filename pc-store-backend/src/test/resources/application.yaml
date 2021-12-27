@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:smart-h2-database-test;DB_CLOSE_ON_EXIT=false
+
+app:
+  archiver:
+    scheduling:
+      enable: false

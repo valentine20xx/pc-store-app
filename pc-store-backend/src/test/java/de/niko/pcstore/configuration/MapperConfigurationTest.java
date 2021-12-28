@@ -165,6 +165,7 @@ public class MapperConfigurationTest {
         Assertions.assertThat(personalComputerShortDTO).isNotNull();
         Assertions.assertThat(personalComputerShortDTO.getId()).isNotNull();
         Assertions.assertThat(personalComputerShortDTO.getVersion()).isNotNull();
-        Assertions.assertThat(personalComputerShortDTO.getDescription()).isEqualTo("[test surname, test name][test cpu/test gpu]");
+        Assertions.assertThat(personalComputerShortDTO.getClient()).isEqualTo("test surname, test name");
+        Assertions.assertThat(personalComputerShortDTO.getPersonalComputer()).isEqualTo("test cpu, test gpu");
     }
 }

@@ -16,7 +16,11 @@ import lombok.experimental.SuperBuilder;
 @ApiModel
 @SuperBuilder
 public class InternalOrderShortDTO extends DefaultDTOObject {
-    @JsonProperty("description")
-    @ApiModelProperty(example = "Computer 1", value = "Short description")
-    private String description;
+    @JsonProperty("client")
+    @ApiModelProperty(example = "Smith, John", value = "Short description (surname, name)")
+    private String client;
+
+    @JsonProperty("client")
+    @ApiModelProperty(example = "AMD Ryzen 7 5800X, AMD Radeon RX 6700 XT 12 G", value = "Short description (Processor, Graphics card)")
+    private String personalComputer;
 }

@@ -4,6 +4,7 @@ package de.niko.pcstore.controller.api;
 import de.niko.pcstore.configuration.Tags;
 import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.InternalOrderDTO;
+import de.niko.pcstore.dto.InternalOrderShortDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,7 +34,7 @@ public interface InternalOrderApi {
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<List<InternalOrderDTO>> getAllInternalOrderList();
+    ResponseEntity<List<InternalOrderShortDTO>> getAllInternalOrderList();
 
     @ApiOperation(value = "Get one specific internal order", response = InternalOrderDTO.class)
     @ApiResponses(value = {

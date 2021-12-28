@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.InternalOrderFileDTO;
+import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.InternalOrderFilePayloadEntity;
@@ -73,10 +74,10 @@ public class InternalOrderApiController implements InternalOrderApi {
 //    }
 
     @Override
-    public ResponseEntity<List<InternalOrderDTO>> getAllInternalOrderList() {
-        List<InternalOrderDTO> internalOrderDTOList = new ArrayList<>();
+    public ResponseEntity<List<InternalOrderShortDTO>> getAllInternalOrderList() {
+        List<InternalOrderShortDTO> internalOrderDTOList = new ArrayList<>();
 
-        internalOrderDTOList.add(InternalOrderDTO.builder().id("test-id-1").build());
+//        internalOrderDTOList.add(InternalOrderDTO.builder().id("test-id-1").build());
 
         return new ResponseEntity<>(internalOrderDTOList, HttpStatus.OK);
     }

@@ -3,43 +3,35 @@ package de.niko.pcstore.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel
 @SuperBuilder
-public class InternalOrderDTO extends DefaultDTOObject {
+public class NewInternalOrderDTO {
     @JsonProperty("clientData")
     @ApiModelProperty(value = "Client data", required = true)
-    private ClientDataDTO clientData;
+    private NewClientDataDTO clientData;
 
     @JsonProperty("personalComputer")
     @ApiModelProperty(value = "Personal computer", required = true)
-    private PersonalComputerDTO personalComputer;
+    private NewPersonalComputerDTO personalComputer;
 
     @JsonProperty("privacyPolicy")
     @ApiModelProperty(example = "true", value = "Data protection regulation agreement", required = true)
     private Boolean privacyPolicy;
 
-    @JsonProperty("internalOrderFiles")
-    @ApiModelProperty("Files")
-    private List<InternalOrderFileDTO> internalOrderFiles;
-
-    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @ApiModel
     @SuperBuilder
-    public static class ClientDataDTO extends DefaultDTOObject {
+    public static class NewClientDataDTO {
         @JsonProperty("salutation")
         @ApiModelProperty(example = "salutations-herr", value = "Gender of the candidate (global variables -> salutation)", required = true)
         private String salutationId;
@@ -81,13 +73,13 @@ public class InternalOrderDTO extends DefaultDTOObject {
         private String email;
     }
 
-    @EqualsAndHashCode(callSuper = true)
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @ApiModel
     @SuperBuilder
-    public static class PersonalComputerDTO extends DefaultDTOObject {
+    public static class NewPersonalComputerDTO {
         @JsonProperty("computerCase")
         @ApiModelProperty(example = "MSI MAG Forge 100R", value = "Name of the case", required = true)
         private String computerCase;
@@ -117,21 +109,5 @@ public class InternalOrderDTO extends DefaultDTOObject {
         private String powerSupplyUnit;
     }
 
-    @EqualsAndHashCode(callSuper = true)
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @ApiModel
-    @SuperBuilder
-    public static class InternalOrderFileDTO extends DefaultDTOObject {
-        @JsonProperty("name")
-        @ApiModelProperty(example = "somefile.pdf", required = true, value = "Name of the file")
-        private String name;
 
-        @JsonProperty("notes")
-        @ApiModelProperty(example = "File is encrypted", value = "Notes with additional information")
-        private String notes;
-    }
 }
-
-

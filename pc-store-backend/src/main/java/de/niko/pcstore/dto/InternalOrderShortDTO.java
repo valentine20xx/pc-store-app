@@ -20,7 +20,7 @@ public class InternalOrderShortDTO extends DefaultDTOObject {
     @ApiModelProperty(example = "Smith, John", value = "Short description (surname, name)")
     private String client;
 
-    @JsonProperty("client")
+    @JsonProperty("personalComputer")
     @ApiModelProperty(example = "AMD Ryzen 7 5800X, AMD Radeon RX 6700 XT 12 G", value = "Short description (Processor, Graphics card)")
     private String personalComputer;
 }

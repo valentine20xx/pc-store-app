@@ -5,6 +5,7 @@ import de.niko.pcstore.configuration.Tags;
 import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
+import de.niko.pcstore.dto.NewInternalOrderDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,9 +29,9 @@ public interface InternalOrderApi {
 //    String DELETE_PERSONAL_COMPUTER = "/personal-computer/{id}";
 
 
-    @ApiOperation(value = "Get all internal orders", response = InternalOrderDTO.class, responseContainer = "List")
+    @ApiOperation(value = "Get all internal orders", response = InternalOrderShortDTO.class, responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "All internal orders", response = InternalOrderDTO.class, responseContainer = "List")})
+            @ApiResponse(code = 200, message = "All internal orders", response = InternalOrderShortDTO.class, responseContainer = "List")})
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
@@ -58,5 +59,5 @@ public interface InternalOrderApi {
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.POST)
-    ResponseEntity<InternalOrderDTO> addInternalOrder(@ApiParam(value = "Object to add") @RequestBody InternalOrderDTO internalOrderDTO);
+    ResponseEntity<InternalOrderDTO> addInternalOrder(@ApiParam(value = "Object to add") @RequestBody NewInternalOrderDTO internalOrderDTO);
 }

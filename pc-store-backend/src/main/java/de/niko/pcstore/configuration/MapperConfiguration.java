@@ -3,7 +3,6 @@ package de.niko.pcstore.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.niko.pcstore.dto.InternalOrderDTO;
-import de.niko.pcstore.dto.InternalOrderFileDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.entity.ClientDataEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
@@ -19,7 +18,6 @@ import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
@@ -51,10 +49,10 @@ public class MapperConfiguration {
     static class ConvertPersonalComputerEntity2PersonalComputerDTO extends PropertyMap<InternalOrderEntity, InternalOrderDTO> {
         @Override
         protected void configure() {
-            Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderFileDTO>> converter = context -> {
+            Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderDTO.InternalOrderFileDTO>> converter = context -> {
                 Set<InternalOrderFileMetadataEntity> source = context.getSource();
 
-                return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).notes(personalComputerFileMetadataEntity.getNotes()).build()).collect(Collectors.toList());
+                return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderDTO.InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).notes(personalComputerFileMetadataEntity.getNotes()).build()).collect(Collectors.toList());
             };
 
             using(converter).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
@@ -64,8 +62,8 @@ public class MapperConfiguration {
     static class ConvertPersonalComputerDTO2PersonalComputerEntity extends PropertyMap<InternalOrderDTO, InternalOrderEntity> {
         @Override
         protected void configure() {
-            Converter<List<InternalOrderFileDTO>, Set<InternalOrderFileMetadataEntity>> converter = context -> {
-                List<InternalOrderFileDTO> source = context.getSource();
+            Converter<List<InternalOrderDTO.InternalOrderFileDTO>, Set<InternalOrderFileMetadataEntity>> converter = context -> {
+                List<InternalOrderDTO.InternalOrderFileDTO> source = context.getSource();
 
                 return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).version(personalComputerFileDTO.getVersion()).name(personalComputerFileDTO.getName()).notes(personalComputerFileDTO.getNotes()).build()).collect(Collectors.toSet());
             };

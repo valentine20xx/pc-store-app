@@ -1,9 +1,7 @@
 package de.niko.pcstore.controller.api;
 
-import de.niko.pcstore.dto.ClientDataDTO;
 import de.niko.pcstore.dto.InternalOrderDTO;
-import de.niko.pcstore.dto.InternalOrderFileDTO;
-import de.niko.pcstore.dto.PersonalComputerDTO;
+import de.niko.pcstore.dto.NewInternalOrderDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.repository.InternalOrderRepository;
@@ -13,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.persistence.TypedQuery;
+import javax.servlet.ServletContext;
 import javax.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.WebApplicationContext;
 
 @AutoConfigureTestEntityManager
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -55,6 +54,12 @@ public class InternalOrderApiControllerTest {
     @Autowired
     private InternalOrderApi internalOrderApi;
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private ServletContext servletContext;
+
     @Test
     @DisplayName("Test upload")
     @Transactional
@@ -63,12 +68,12 @@ public class InternalOrderApiControllerTest {
 
         String idForUpload;
         {
-            InternalOrderDTO internalOrderDTO = InternalOrderDTO.builder().clientData(
-                    ClientDataDTO.builder().name("CD-name-1").surname("CD-name-2").build()
+            NewInternalOrderDTO internalOrderDTO = NewInternalOrderDTO.builder().clientData(
+                    NewInternalOrderDTO.NewClientDataDTO.builder().name("CD-name-1").surname("CD-name-2").build()
             ).personalComputer(
-                    PersonalComputerDTO.builder().processor("PC-processor-1").graphicsCard("PC-graphicsCard-1").build()
+                    NewInternalOrderDTO.NewPersonalComputerDTO.builder().processor("PC-processor-1").graphicsCard("PC-graphicsCard-1").build()
             ).build();
-            HttpEntity<InternalOrderDTO> requestEntity = new HttpEntity<>(internalOrderDTO);
+            HttpEntity<NewInternalOrderDTO> requestEntity = new HttpEntity<>(internalOrderDTO);
 
             String url = BASE_URI + InternalOrderApi.ADD_INTERNAL_ORDER;
             ResponseEntity<InternalOrderDTO> responseEntity = testRestTemplate.postForEntity(url, requestEntity, InternalOrderDTO.class);
@@ -85,7 +90,7 @@ public class InternalOrderApiControllerTest {
         {
             String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_UPLOAD;
 
-            InternalOrderFileDTO internalOrderFileDTO = InternalOrderFileDTO.builder().name("IOF-1").notes("bla-bla-bla").build();
+            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = InternalOrderDTO.InternalOrderFileDTO.builder().name("IOF-1").notes("bla-bla-bla").build();
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -107,7 +112,7 @@ public class InternalOrderApiControllerTest {
     }
 
     @Test
-    @DisplayName("Test addPersonalComputerMultipart")
+    @DisplayName("Test addPersonalComputerMultipart + download")
     @Transactional // a Session is needed (otherwise: failed to lazily initialize)
     public void addPersonalComputerMultipartTest() {
         String BASE_URI = "http://localhost:" + port;
@@ -118,10 +123,10 @@ public class InternalOrderApiControllerTest {
             String url = BASE_URI + InternalOrderApiController.ADD_INTERNAL_ORDER_MULTIPART;
 
             InternalOrderDTO internalOrderDTO = InternalOrderDTO.builder().personalComputer(
-                    PersonalComputerDTO.builder().computerCase("PC-computerCase").build()
+                    InternalOrderDTO.PersonalComputerDTO.builder().computerCase("PC-computerCase").build()
             ).clientData(
-                    ClientDataDTO.builder().name("CD-name").surname("CD-surname").build()
-            ).internalOrderFiles(List.of(InternalOrderFileDTO.builder().id("UUID-FILE-1").name("test-file-pom.xml").build())).build();
+                    InternalOrderDTO.ClientDataDTO.builder().name("CD-name").surname("CD-surname").build()
+            ).internalOrderFiles(List.of(InternalOrderDTO.InternalOrderFileDTO.builder().id("UUID-FILE-1").name("test-file-pom.xml").build())).build();
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -142,7 +147,7 @@ public class InternalOrderApiControllerTest {
 
             personalComputerSavedId = personalComputerSavedDTO.getId();
 
-            List<InternalOrderFileDTO> personalComputerFiles = personalComputerSavedDTO.getInternalOrderFiles();
+            List<InternalOrderDTO.InternalOrderFileDTO> personalComputerFiles = personalComputerSavedDTO.getInternalOrderFiles();
 
             Assertions.assertThat(personalComputerFiles).isNotNull();
             Assertions.assertThat(personalComputerFiles.size()).isEqualTo(1);
@@ -183,19 +188,6 @@ public class InternalOrderApiControllerTest {
             });
         }
     }
-
-    //    @Test
-//    @DisplayName("Test download")
-//    @Transactional
-//    public void downloadTest() {
-//        ResponseEntity<byte[]> responseEntity = ((PersonalComputerApiController) personalComputerApi).download("test-personal-computer-file-metadata-entity-id-2");
-//
-//        Assertions.assertThat(responseEntity).isNotNull();
-//        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        byte[] bytes = responseEntity.getBody();
-//        Assertions.assertThat(bytes).isNotNull();
-//    }
 
     @BeforeEach
     private void initializeDatabase() {

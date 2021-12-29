@@ -3,8 +3,8 @@ package de.niko.pcstore.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.niko.pcstore.dto.InternalOrderDTO;
-import de.niko.pcstore.dto.InternalOrderFileDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
+import de.niko.pcstore.dto.NewInternalOrderDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.InternalOrderFilePayloadEntity;
@@ -13,11 +13,11 @@ import de.niko.pcstore.repository.InternalOrderRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -75,9 +75,9 @@ public class InternalOrderApiController implements InternalOrderApi {
 
     @Override
     public ResponseEntity<List<InternalOrderShortDTO>> getAllInternalOrderList() {
-        List<InternalOrderShortDTO> internalOrderDTOList = new ArrayList<>();
+        var internalOrderEntities = internalOrderRepository.findAll();
 
-//        internalOrderDTOList.add(InternalOrderDTO.builder().id("test-id-1").build());
+        var internalOrderDTOList = internalOrderEntities.stream().map(internalOrderEntity -> modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class)).collect(Collectors.toUnmodifiableList());
 
         return new ResponseEntity<>(internalOrderDTOList, HttpStatus.OK);
     }
@@ -100,11 +100,9 @@ public class InternalOrderApiController implements InternalOrderApi {
     }
 
     @Override
-    public ResponseEntity<InternalOrderDTO> addInternalOrder(InternalOrderDTO internalOrderDTO) {
-        var personalComputerEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
-        // TODO add optimistic lock try
-
-        var personalComputerSavedEntity = internalOrderRepository.saveAndFlush(personalComputerEntity);
+    public ResponseEntity<InternalOrderDTO> addInternalOrder(NewInternalOrderDTO internalOrderDTO) {
+        var internalOrderEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
+        var personalComputerSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
         var candidateSavedDTO = modelMapper.map(personalComputerSavedEntity, InternalOrderDTO.class);
 
         return new ResponseEntity<>(candidateSavedDTO, HttpStatus.OK);
@@ -123,10 +121,10 @@ public class InternalOrderApiController implements InternalOrderApi {
     public ResponseEntity<Void> upload(@ApiParam(value = "internal order id", required = true) @PathVariable("internal-order-id") String internalOrderId, StandardMultipartHttpServletRequest standardMultipartHttpServletRequest) {
         String internalOrderFileAsJSON = standardMultipartHttpServletRequest.getParameter("internal-order-file");
 
-        Optional<InternalOrderFileDTO> candidateFileDTOOptional = convertInternalOrderFileJSON2InternalOrderFileDTO(internalOrderFileAsJSON);
+        Optional<InternalOrderDTO.InternalOrderFileDTO> candidateFileDTOOptional = convertInternalOrderFileJSON2InternalOrderFileDTO(internalOrderFileAsJSON);
 
         if (candidateFileDTOOptional.isPresent()) {
-            InternalOrderFileDTO internalOrderFileDTO = candidateFileDTOOptional.get();
+            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = candidateFileDTOOptional.get();
 //            String id = internalOrderFileDTO.getId();
 
             Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(internalOrderId);
@@ -168,9 +166,9 @@ public class InternalOrderApiController implements InternalOrderApi {
         }
     }
 
-    private Optional<InternalOrderFileDTO> convertInternalOrderFileJSON2InternalOrderFileDTO(String internalOrderFileAsJSON) {
+    private Optional<InternalOrderDTO.InternalOrderFileDTO> convertInternalOrderFileJSON2InternalOrderFileDTO(String internalOrderFileAsJSON) {
         try {
-            InternalOrderFileDTO internalOrderFileDTO = objectMapper.readValue(internalOrderFileAsJSON, InternalOrderFileDTO.class);
+            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = objectMapper.readValue(internalOrderFileAsJSON, InternalOrderDTO.InternalOrderFileDTO.class);
 
             return Optional.ofNullable(internalOrderFileDTO);
         } catch (JsonProcessingException e) {

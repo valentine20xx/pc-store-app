@@ -1,8 +1,6 @@
 package de.niko.pcstore.configuration;
 
 import de.niko.pcstore.dto.InternalOrderDTO;
-import de.niko.pcstore.dto.PersonalComputerDTO;
-import de.niko.pcstore.dto.InternalOrderFileDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.entity.ClientDataEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
@@ -37,7 +35,7 @@ public class MapperConfigurationTest {
         String internal_order_file_name = "test-internal-order-file-name-1";
 
         InternalOrderDTO internalOrderDTO = InternalOrderDTO.builder().id(internal_order_id).version(version).internalOrderFiles(List.of(
-                InternalOrderFileDTO.builder().id(internal_order_file_id).version(version).name(internal_order_file_name).build()
+                InternalOrderDTO.InternalOrderFileDTO.builder().id(internal_order_file_id).version(version).name(internal_order_file_name).build()
         )).build();
 
         InternalOrderEntity internalOrderEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
@@ -99,7 +97,7 @@ public class MapperConfigurationTest {
         String storageDevice = "test-personal-computer-storageDevice-1";
         String powerSupplyUnit = "test-personal-computer-powerSupplyUnit-1";
 
-        PersonalComputerDTO personalComputerDTO = PersonalComputerDTO.builder().id(id).version(version).computerCase(caseName).motherboard(motherboard).processor(processor).graphicsCard(graphicsCard).randomAccessMemory(randomAccessMemory).storageDevice(storageDevice).powerSupplyUnit(powerSupplyUnit).build();
+        InternalOrderDTO.PersonalComputerDTO personalComputerDTO = InternalOrderDTO.PersonalComputerDTO.builder().id(id).version(version).computerCase(caseName).motherboard(motherboard).processor(processor).graphicsCard(graphicsCard).randomAccessMemory(randomAccessMemory).storageDevice(storageDevice).powerSupplyUnit(powerSupplyUnit).build();
 
         PersonalComputerEntity personalComputerEntity = modelMapper.map(personalComputerDTO, PersonalComputerEntity.class);
 
@@ -131,7 +129,7 @@ public class MapperConfigurationTest {
 
         PersonalComputerEntity personalComputerEntity = PersonalComputerEntity.builder().id(id).version(version).computerCase(caseName).motherboard(motherboard).processor(processor).graphicsCard(graphicsCard).randomAccessMemory(randomAccessMemory).storageDevice(storageDevice).powerSupplyUnit(powerSupplyUnit).build();
 
-        PersonalComputerDTO personalComputerDTO = modelMapper.map(personalComputerEntity, PersonalComputerDTO.class);
+        InternalOrderDTO.PersonalComputerDTO personalComputerDTO = modelMapper.map(personalComputerEntity, InternalOrderDTO.PersonalComputerDTO.class);
 
         Assertions.assertThat(personalComputerDTO).isNotNull();
         Assertions.assertThat(personalComputerDTO.getId()).isEqualTo(personalComputerEntity.getId()).isEqualTo(id);

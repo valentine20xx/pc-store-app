@@ -1,0 +1,57 @@
+<mat-sidenav-container [hasBackdrop]="true" fullscreen>
+  <mat-sidenav #mainSidenav mode="push" style="width: 15em">
+    <h2 style="text-align: center;">Menu</h2>
+
+    <mat-nav-list>
+      <mat-list-item (click)="globalVariablesMenuButtonClick()">Global variables</mat-list-item>
+      <mat-list-item (click)="internalOrdersOverviewButtonClick()">Internal orders</mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div style="min-height: 100vh;" fxLayout="column">
+      <mat-toolbar color="primary" fxLayout="row">
+        <ng-container *ngIf="mainSidenav.opened == false">
+          <button mat-icon-button (click)="mainSidenav.open()" matTooltip="Open menu"
+                  matTooltipShowDelay="2000"
+                  matTooltipHideDelay="1000">
+            <mat-icon>menu</mat-icon>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="mainSidenav.opened == true">
+          <button mat-icon-button>
+            <mat-icon>
+              arrow_back
+            </mat-icon>
+          </button>
+        </ng-container>
+
+        <div style="word-wrap: break-word;text-align: center; font-weight: bold; font-size: 1.5em" fxFlex="1 1 auto;">PC Store</div>
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>
+            <mat-icon>help_outline</mat-icon>
+            <span>Hilfe</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>power_settings_new</mat-icon>
+            <span>Abmelden</span>
+          </button>
+        </mat-menu>
+      </mat-toolbar>
+      <div class="main-section" fxFlex="grow">
+        <router-outlet></router-outlet>
+      </div>
+
+      <div class="footer-section" fxLayout="row-reverse" fxFlexAlign="end center">
+        <ng-container *ngIf="!isProduction">
+          <div fxLayout="column" fxFlexAlign="center">
+            Stage = {{ environment.stage }}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

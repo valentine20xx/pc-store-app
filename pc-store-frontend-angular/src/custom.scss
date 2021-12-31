@@ -1,0 +1,66 @@
+@import '~@angular/material/theming';
+@import '~@angular/cdk/overlay-prebuilt.css';
+
+@include mat-core(); // TODO: should be. Why ?
+
+$blue-color: rgba(0, 0, 255, 0.5);
+
+$pcstore-primary: mat-palette((
+  500: $blue-color,
+  contrast: (
+    500: #FFF,
+  )
+));
+
+$pcstore-accent: mat-palette((
+  500 : rgb(255, 96, 0),
+  contrast: (
+    500: #FFF,
+  )
+), 500);
+
+$pcstore-warn: mat-palette((
+  500: rgb(255, 0, 0, 0.5),
+  contrast: (
+    500: #FFF,
+  )
+), 500);
+
+$pcstore-theme: mat-dark-theme($pcstore-primary, $pcstore-accent, $pcstore-warn);
+
+@include angular-material-theme($pcstore-theme);
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-drawer-backdrop.mat-drawer-shown {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.main-section {
+  padding: 0.5em;
+}
+
+.footer-section {
+  padding: 0.5em;
+  height: 3em;
+  background-color: $blue-color
+}
+
+.final-section-item {
+  margin-bottom: 1em;
+
+  .final-section-sub-item {
+    padding-left: 2em;
+  }
+}
+
+.mat-table {
+  width: 100%;
+}

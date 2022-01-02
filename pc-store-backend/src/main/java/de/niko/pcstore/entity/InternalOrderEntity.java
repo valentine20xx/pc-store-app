@@ -1,7 +1,9 @@
 package de.niko.pcstore.entity;
 
+import java.time.LocalDate;
 import java.util.Set;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -34,4 +36,12 @@ public class InternalOrderEntity extends DefaultPersistenceObject {
     @JoinColumn(name = "internal_order_id")
     private Set<InternalOrderFileMetadataEntity> internalOrderFileMetadataEntities;
 
+    @Column
+    private LocalDate dateOfReceiving;
+    // TODO new fields
+    @JoinColumn(name = "status_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private GlobalVariableEntity statusObject;
+    @Column(name = "status_id")
+    private String statusId;
 }

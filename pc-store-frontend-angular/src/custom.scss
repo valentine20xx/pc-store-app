@@ -47,6 +47,10 @@ body {
   padding: 0.5em;
 }
 
+.section {
+  margin: 0.5em;
+}
+
 .footer-section {
   padding: 0.5em;
   height: 3em;
@@ -55,7 +59,9 @@ body {
 
 .final-section-item {
   margin-bottom: 1em;
-
+  .final-section-title {
+    font-size: x-large;
+  }
   .final-section-sub-item {
     padding-left: 2em;
   }
@@ -63,4 +69,8 @@ body {
 
 .mat-table {
   width: 100%;
+}
+
+.stepper-section {
+  margin-bottom: 1em;
 }

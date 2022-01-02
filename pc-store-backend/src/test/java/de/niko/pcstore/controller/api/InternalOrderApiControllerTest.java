@@ -4,6 +4,7 @@ import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
+import de.niko.pcstore.repository.GlobalVariableRepository;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import java.io.File;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -49,6 +51,10 @@ public class InternalOrderApiControllerTest {
     private InternalOrderRepository internalOrderRepository;
 
     @Autowired
+//    @Qualifier("globalVariableRepository")
+    private GlobalVariableRepository globalVariableRepository;
+
+    @Autowired
     private TestEntityManager testEntityManager;
 
     @Autowired
@@ -63,6 +69,7 @@ public class InternalOrderApiControllerTest {
     @Test
     @DisplayName("Test upload")
     @Transactional
+    @Sql("/test-internal-orders.sql")
     public void uploadTest() {
         String BASE_URI = "http://localhost:" + port;
 
@@ -90,7 +97,7 @@ public class InternalOrderApiControllerTest {
         {
             String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_UPLOAD;
 
-            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = InternalOrderDTO.InternalOrderFileDTO.builder().name("IOF-1").notes("bla-bla-bla").build();
+            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = InternalOrderDTO.InternalOrderFileDTO.builder().name("IOF-1").note("bla-bla-bla").build();
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -112,9 +119,10 @@ public class InternalOrderApiControllerTest {
     }
 
     @Test
-    @DisplayName("Test addPersonalComputerMultipart + download")
+    @DisplayName("Test addInternalOrderMultipart + download")
     @Transactional // a Session is needed (otherwise: failed to lazily initialize)
-    public void addPersonalComputerMultipartTest() {
+    @Sql("/test-internal-orders.sql")
+    public void addInternalOrderMultipartTest() {
         String BASE_URI = "http://localhost:" + port;
 
         String idForDownload;
@@ -142,17 +150,22 @@ public class InternalOrderApiControllerTest {
             Assertions.assertThat(responseEntity).isNotNull();
             Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            InternalOrderDTO personalComputerSavedDTO = responseEntity.getBody();
-            Assertions.assertThat(personalComputerSavedDTO).isNotNull();
+            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+            Assertions.assertThat(internalOrderSavedDTO.getId()).isNotNull();
+            Assertions.assertThat(internalOrderSavedDTO.getVersion()).isNotNull();
+//            Assertions.assertThat(internalOrderSavedDTO.getStatusId()).isEqualTo("order-status-open");
+            Assertions.assertThat(internalOrderSavedDTO.getDateOfReceiving()).isNotNull();
 
-            personalComputerSavedId = personalComputerSavedDTO.getId();
+            personalComputerSavedId = internalOrderSavedDTO.getId();
 
-            List<InternalOrderDTO.InternalOrderFileDTO> personalComputerFiles = personalComputerSavedDTO.getInternalOrderFiles();
+            List<InternalOrderDTO.InternalOrderFileDTO> internalOrderFiles = internalOrderSavedDTO.getInternalOrderFiles();
 
-            Assertions.assertThat(personalComputerFiles).isNotNull();
-            Assertions.assertThat(personalComputerFiles.size()).isEqualTo(1);
+            Assertions.assertThat(internalOrderFiles).isNotNull();
+            Assertions.assertThat(internalOrderFiles.size()).isEqualTo(1);
 
-            idForDownload = personalComputerFiles.get(0).getId();
+
+            idForDownload = internalOrderFiles.get(0).getId();
         }
         {
             String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_DOWNLOAD;

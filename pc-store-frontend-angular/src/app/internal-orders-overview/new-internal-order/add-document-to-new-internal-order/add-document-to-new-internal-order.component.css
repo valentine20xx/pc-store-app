@@ -1,0 +1,24 @@
+.fileUpload {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.fileUploadButton {
+  text-align: center;
+  border-width: 2px;
+  border-style: solid;
+  padding: 1em 0;
+  border-radius: 5px;
+  border-color: rgba(0, 0, 0, .12);
+  color: gray;
+  margin-bottom: 1em;
+}
+
+.fileUploadInput {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}

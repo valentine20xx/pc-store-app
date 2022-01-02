@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {NewInternalOrdersComponent} from './new-internal-orders/new-internal-orders.component';
+import {NewInternalOrderComponent} from './new-internal-order/new-internal-order.component';
 
 @Component({
   selector: 'app-internal-orders-overview',
@@ -15,7 +15,7 @@ export class InternalOrdersOverviewComponent implements OnInit {
   }
 
   createNewOrderClick(): void {
-    this.dialog.open<NewInternalOrdersComponent, any, any>(NewInternalOrdersComponent, {
+    this.dialog.open<NewInternalOrderComponent, any, any>(NewInternalOrderComponent, {
       minWidth: '40em',
       data: {},
       disableClose: true

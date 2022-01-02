@@ -73,7 +73,6 @@ public class NewInternalOrderDTO {
         private String email;
     }
 
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -108,6 +107,4 @@ public class NewInternalOrderDTO {
         @ApiModelProperty(example = "700W - be quiet! Pure power 11", value = "Name of the power supply unit", required = true)
         private String powerSupplyUnit;
     }
-
-
 }

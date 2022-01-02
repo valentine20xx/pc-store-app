@@ -1,5 +1,5 @@
 import {ReferenceConverterPipe} from './reference-converter.pipe';
-import {IdNamePair} from "../../internal-orders-overview/new-internal-orders/new-internal-orders.component";
+import {IdNamePair} from "../../internal-orders-overview/new-internal-order/new-internal-order.component";
 
 describe('ReferenceConverterPipe', () => {
   let pipe: ReferenceConverterPipe;

@@ -27,7 +27,7 @@ public class InternalOrderFileMetadataEntity extends DefaultPersistenceObject {
     @Column
     private String type;
     @Column
-    private String notes;
+    private String note;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "internal_order_file_payload_id")

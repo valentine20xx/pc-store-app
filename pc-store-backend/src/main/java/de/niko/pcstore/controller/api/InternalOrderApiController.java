@@ -9,10 +9,12 @@ import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.InternalOrderFilePayloadEntity;
 import de.niko.pcstore.logging.InternalOrderApiLogMessages;
+import de.niko.pcstore.repository.GlobalVariableRepository;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,7 @@ import javax.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,11 +43,13 @@ public class InternalOrderApiController implements InternalOrderApi {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final InternalOrderRepository internalOrderRepository;
+    private final GlobalVariableRepository globalVariableRepository;
 
-    public InternalOrderApiController(InternalOrderRepository internalOrderRepository, ModelMapper modelMapper, ObjectMapper objectMapper) {
+    public InternalOrderApiController(InternalOrderRepository internalOrderRepository, ModelMapper modelMapper, ObjectMapper objectMapper, GlobalVariableRepository globalVariableRepository) {
         this.internalOrderRepository = internalOrderRepository;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
+        this.globalVariableRepository = globalVariableRepository;
     }
 
     //    @Override
@@ -135,14 +140,14 @@ public class InternalOrderApiController implements InternalOrderApi {
                 MultipartFile multipartFile = standardMultipartHttpServletRequest.getFile("file");
                 if (multipartFile != null) {
                     String name = internalOrderFileDTO.getName();
-                    String notes = internalOrderFileDTO.getNotes();
+                    String note = internalOrderFileDTO.getNote();
 
                     String mimeType = multipartFile.getContentType();
                     byte[] payload = multipartFile.getBytes();
 
                     InternalOrderFileMetadataEntity internalOrderFileMetadataEntity = InternalOrderFileMetadataEntity.builder()
                             .name(name)
-                            .notes(notes)
+                            .note(note)
                             .internalOrderFilePayloadEntity(
                                     InternalOrderFilePayloadEntity.builder().mimeType(mimeType).payload(payload).build()
                             )
@@ -209,7 +214,7 @@ public class InternalOrderApiController implements InternalOrderApi {
     @RequestMapping(value = ADD_INTERNAL_ORDER_MULTIPART,
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             method = RequestMethod.POST)
-    public ResponseEntity<Object> addPersonalComputerMultipart(StandardMultipartHttpServletRequest standardMultipartHttpServletRequest) {
+    public ResponseEntity<Object> addInternalOrderMultipart(StandardMultipartHttpServletRequest standardMultipartHttpServletRequest) {
         String internalOrderAsJSON = standardMultipartHttpServletRequest.getParameter("internal-order");
 
         Optional<InternalOrderDTO> internalOrderDTOOptional = convertInternalOrderJSON2InternalOrderDTO(internalOrderAsJSON);
@@ -218,6 +223,8 @@ public class InternalOrderApiController implements InternalOrderApi {
             InternalOrderDTO internalOrderDTO = internalOrderDTOOptional.get();
 
             InternalOrderEntity internalOrderEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
+            internalOrderEntity.setStatusId("order-status-open");
+            internalOrderEntity.setDateOfReceiving(LocalDate.now());
 
             Set<InternalOrderFileMetadataEntity> internalOrderFileMetadataEntities = internalOrderEntity.getInternalOrderFileMetadataEntities();
             if (!CollectionUtils.isEmpty(internalOrderFileMetadataEntities)) {

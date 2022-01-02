@@ -7,6 +7,7 @@ import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.PersonalComputerEntity;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import org.assertj.core.api.Assertions;
@@ -25,7 +26,7 @@ public class MapperConfigurationTest {
     private ModelMapper modelMapper;
 
     @Test
-    @DisplayName("InternalOrderDTO -> InternalOrderEntity ")
+    @DisplayName("InternalOrderDTO -> InternalOrderEntity")
     public void convertInternalOrderDTO2InternalOrderEntityTest() {
         Assertions.assertThat(modelMapper).isNotNull();
 
@@ -153,9 +154,13 @@ public class MapperConfigurationTest {
         String graphicsCard = "test gpu";
         String name = "test name";
         String surname = "test surname";
+        LocalDate dateOfReceiving = LocalDate.now();
+
         InternalOrderEntity internalOrderEntity = InternalOrderEntity.builder().id(internal_order_id).version(version)
                 .personalComputer(PersonalComputerEntity.builder().processor(processor).graphicsCard(graphicsCard).build())
                 .clientData(ClientDataEntity.builder().name(name).surname(surname).build())
+                .dateOfReceiving(dateOfReceiving)
+                .statusId("order-status-open")
                 .build();
 
         InternalOrderShortDTO personalComputerShortDTO = modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class);
@@ -165,5 +170,7 @@ public class MapperConfigurationTest {
         Assertions.assertThat(personalComputerShortDTO.getVersion()).isNotNull();
         Assertions.assertThat(personalComputerShortDTO.getClient()).isEqualTo("test surname, test name");
         Assertions.assertThat(personalComputerShortDTO.getPersonalComputer()).isEqualTo("test cpu, test gpu");
+        Assertions.assertThat(personalComputerShortDTO.getStatusId()).isEqualTo("order-status-open");
+        Assertions.assertThat(personalComputerShortDTO.getDateOfReceiving()).isEqualTo(dateOfReceiving);
     }
 }

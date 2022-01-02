@@ -9,6 +9,7 @@ import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.PersonalComputerEntity;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class MapperConfiguration {
             Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderDTO.InternalOrderFileDTO>> converter = context -> {
                 Set<InternalOrderFileMetadataEntity> source = context.getSource();
 
-                return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderDTO.InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).notes(personalComputerFileMetadataEntity.getNotes()).build()).collect(Collectors.toList());
+                return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderDTO.InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).note(personalComputerFileMetadataEntity.getNote()).build()).collect(Collectors.toList());
             };
 
             using(converter).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
@@ -65,7 +66,7 @@ public class MapperConfiguration {
             Converter<List<InternalOrderDTO.InternalOrderFileDTO>, Set<InternalOrderFileMetadataEntity>> converter = context -> {
                 List<InternalOrderDTO.InternalOrderFileDTO> source = context.getSource();
 
-                return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).version(personalComputerFileDTO.getVersion()).name(personalComputerFileDTO.getName()).notes(personalComputerFileDTO.getNotes()).build()).collect(Collectors.toSet());
+                return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).version(personalComputerFileDTO.getVersion()).name(personalComputerFileDTO.getName()).note(personalComputerFileDTO.getNote()).build()).collect(Collectors.toSet());
             };
 
             using(converter).map(source.getInternalOrderFiles(), destination.getInternalOrderFileMetadataEntities());
@@ -88,9 +89,17 @@ public class MapperConfiguration {
             String id = internalOrderEntity.getId();
             Timestamp version = internalOrderEntity.getVersion();
 
-            return InternalOrderShortDTO.builder().id(id).version(version).client(surname + ", " + name).personalComputer(processor + ", " + graphicsCard).build();
+            String statusId = internalOrderEntity.getStatusId();
+            LocalDate dateOfReceiving = internalOrderEntity.getDateOfReceiving();
+
+            return InternalOrderShortDTO.builder()
+                    .id(id)
+                    .version(version)
+                    .client(surname + ", " + name)
+                    .personalComputer(processor + ", " + graphicsCard)
+                    .dateOfReceiving(dateOfReceiving)
+                    .statusId(statusId)
+                    .build();
         }
     }
-
-
 }

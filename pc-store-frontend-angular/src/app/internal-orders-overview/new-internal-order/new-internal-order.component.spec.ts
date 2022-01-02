@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewInternalOrdersComponent } from './new-internal-orders.component';
+import { NewInternalOrderComponent } from './new-internal-order.component';
 
-describe('NewInternalOrdersComponent', () => {
-  let component: NewInternalOrdersComponent;
-  let fixture: ComponentFixture<NewInternalOrdersComponent>;
+describe('NewInternalOrderComponent', () => {
+  let component: NewInternalOrderComponent;
+  let fixture: ComponentFixture<NewInternalOrderComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NewInternalOrdersComponent ]
+      declarations: [ NewInternalOrderComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewInternalOrdersComponent);
+    fixture = TestBed.createComponent(NewInternalOrderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

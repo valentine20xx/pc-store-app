@@ -1,6 +1,8 @@
-logs
+# H2 database file
+**.mv.db
+**.trace.db
+logs/
 
-pc-store-h2-database.mv.db
-pc-store-h2-database.trace.db
-
+# Idea
 .idea
+**.iml

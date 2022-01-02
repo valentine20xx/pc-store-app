@@ -20,13 +20,15 @@ import {GlobalVariablesOverviewComponent} from './global-variables-overview/glob
 import {WellcomePageComponent} from './wellcome-page/wellcome-page.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {MatTableModule} from "@angular/material/table";
-import {NewInternalOrdersComponent} from './internal-orders-overview/new-internal-orders/new-internal-orders.component';
+import {NewInternalOrderComponent} from './internal-orders-overview/new-internal-order/new-internal-order.component';
 import {MatDialogModule} from '@angular/material/dialog';
-import {MatStepperModule} from "@angular/material/stepper";
-import {ReactiveFormsModule} from "@angular/forms";
+import {MatStepperModule} from '@angular/material/stepper';
+import {ReactiveFormsModule} from '@angular/forms';
 import {AutoTrimDirective} from './utils/directives/auto-trim.directive';
-import {MatInputModule} from "@angular/material/input";
-import { ReferenceConverterPipe } from './utils/pipes/reference-converter.pipe';
+import {MatInputModule} from '@angular/material/input';
+import {ReferenceConverterPipe} from './utils/pipes/reference-converter.pipe';
+import {AddDocumentToNewInternalOrderComponent} from './internal-orders-overview/new-internal-order/add-document-to-new-internal-order/add-document-to-new-internal-order.component';
+import {ErrorDialogComponent} from './error-dialog/error-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,9 +36,11 @@ import { ReferenceConverterPipe } from './utils/pipes/reference-converter.pipe';
     InternalOrdersOverviewComponent,
     GlobalVariablesOverviewComponent,
     WellcomePageComponent,
-    NewInternalOrdersComponent,
+    NewInternalOrderComponent,
     AutoTrimDirective,
-    ReferenceConverterPipe
+    ReferenceConverterPipe,
+    AddDocumentToNewInternalOrderComponent,
+    ErrorDialogComponent
   ],
   imports: [
     BrowserModule,

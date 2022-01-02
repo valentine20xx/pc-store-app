@@ -25,11 +25,12 @@ ng test pc-store-frontend-angular --source-map
 
 ### To-do-Liste
 
-- Swagger importer: https://www.npmjs.com/package/swagger-angular-generator
-- NgRx: https://ngrx.io/
-- UI and Backend communication synchronize
-- street + houseNumber: dynamic validation (upgrade fix)
-- UI Unit Tests
-- Refactor and upgrade fixing
+- [ ] Swagger importer: https://www.npmjs.com/package/swagger-angular-generator
+- [ ] NgRx: https://ngrx.io/
+- [ ] UI and Backend communication synchronize
+- [ ] street + houseNumber: dynamic validation (upgrade fix)
+- [ ] UI Unit Tests
+- [ ] Refactor and upgrade fixing
+- [ ] Loader
+- 
 
-- sidenav vs drawer: what is the difference ?

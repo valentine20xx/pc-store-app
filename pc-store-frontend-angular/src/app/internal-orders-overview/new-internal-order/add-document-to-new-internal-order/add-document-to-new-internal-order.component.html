@@ -1,0 +1,39 @@
+<form [formGroup]="fileUploadForm" (ngSubmit)="onSubmitClick()">
+  <div fxLayout="row" fxLayoutAlign="space-between start">
+    <h2 mat-dialog-title>Add document</h2>
+    <button mat-mini-fab color="primary" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <mat-dialog-content fxLayout="column">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input appAutoTrim matInput formControlName="name" (ngModelChange)="onChangeFileName($event)">
+      <mat-error *ngIf="fileUploadForm.controls.name.hasError('required')">
+        Name ist ein Pflichtfeld
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Anmerkung</mat-label>
+      <textarea appAutoTrim matInput cdkTextareaAutosize formControlName="note"
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="7"></textarea>
+    </mat-form-field>
+
+    <div class="fileUpload">
+      <div class="fileUploadButton">
+        Drücken Sie, bitte hier, um eine Datei zu wählen
+      </div>
+      <input class="fileUploadInput" formControlName="file" type="file" (change)="onChangeFileInput($event)"/>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-raised-button type="button" (click)="onCancelClick()">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" type="submit">
+      Add
+    </button>
+  </mat-dialog-actions>
+</form>

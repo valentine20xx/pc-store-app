@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>Error</h1>
+<div mat-dialog-content>
+  {{ inputData.message }}
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-raised-button *ngIf="inputData.cancelable" (click)="cancelClick()">Abbrechen</button>
+  <button mat-raised-button color="primary" (click)="retryClick()">Retry</button>
+</div>

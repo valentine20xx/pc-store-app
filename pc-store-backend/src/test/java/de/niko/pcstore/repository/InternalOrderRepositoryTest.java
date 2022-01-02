@@ -1,5 +1,6 @@
 package de.niko.pcstore.repository;
 
+import de.niko.pcstore.entity.GlobalVariableEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.PersonalComputerEntity;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -27,51 +29,30 @@ public class InternalOrderRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Test
-    @DisplayName("Test findAll and findById")
+    @DisplayName("Test findAll")
+    @Sql("/test-internal-orders.sql")
     public void findAllTest() {
         List<InternalOrderEntity> internalOrderEntities = internalOrderRepository.findAll();
 
         Assertions.assertThat(internalOrderEntities).isNotNull();
-        Assertions.assertThat(internalOrderEntities.size()).isEqualTo(2);
+        Assertions.assertThat(internalOrderEntities.size()).isEqualTo(1);
         internalOrderEntities.forEach(internalOrderEntity -> {
             Assertions.assertThat(internalOrderEntity.getId()).isNotNull();
             Assertions.assertThat(internalOrderEntity.getVersion()).isNotNull();
         });
-
-        InternalOrderEntity secondInternalOrderEntity = internalOrderEntities.get(1);
-
-        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(secondInternalOrderEntity.getId());
-        Assertions.assertThat(internalOrderEntityOptional.isPresent()).isTrue();
     }
 
-//    @Test
-//    @DisplayName("Test save")
-//    public void saveTest() {
-//        InternalOrderEntity internalOrderEntity = InternalOrderEntity.builder().internalOrderFileMetadataEntities(Set.of(
-//                InternalOrderFileMetadataEntity.builder().name("IOFME-name").build()
-//        )).build();
-//
-//        InternalOrderEntity internalOrderSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
-//
-//        Query query = testEntityManager.getEntityManager().createNativeQuery("SELECT * FROM INTERNAL_ORDER JOIN INTERNAL_ORDER_FILE_METADATA IOFM on INTERNAL_ORDER.ID = IOFM.INTERNAL_ORDER_ID", InternalOrderEntity.class);
-//        List<Object> resultList = query.getResultList();
-//        Assertions.assertThat(resultList).isNotNull();
-//
-//
-////        PersonalComputerEntity personalComputerEntity = personalComputerRepository.saveAll();
-//    }
+    @Test
+    @DisplayName("Test findById")
+    @Sql("/test-internal-orders.sql")
+    public void findByIdTest() {
+        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById("INTERNAL_ORDER_ID_1");
+        Assertions.assertThat(internalOrderEntityOptional.isPresent()).isTrue();
 
-    @BeforeEach
-    public void initializeDatabase() {
-        Assertions.assertThat(internalOrderRepository).isNotNull();
-        Assertions.assertThat(testEntityManager).isNotNull();
+        InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+        Assertions.assertThat(internalOrderEntity.getId()).isEqualTo("INTERNAL_ORDER_ID_1");
 
-        InternalOrderEntity internalOrderEntity1 = InternalOrderEntity.builder().build();
-        InternalOrderEntity internalOrderEntity2 = InternalOrderEntity.builder().personalComputer(
-                PersonalComputerEntity.builder().processor("PCE-processor-1").build()
-        ).build();
-        InternalOrderEntity internalOrderEntity3 = InternalOrderEntity.builder().dateOfDeletion(new Timestamp(System.currentTimeMillis())).build();
-
-        internalOrderRepository.saveAllAndFlush(List.of(internalOrderEntity1, internalOrderEntity2, internalOrderEntity3));
+        internalOrderEntityOptional = internalOrderRepository.findById("not-found");
+        Assertions.assertThat(internalOrderEntityOptional.isEmpty()).isTrue();
     }
 }

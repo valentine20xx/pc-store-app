@@ -1,8 +1,10 @@
 package de.niko.pcstore.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +34,15 @@ public class InternalOrderDTO extends DefaultDTOObject {
     @JsonProperty("internalOrderFiles")
     @ApiModelProperty("Files")
     private List<InternalOrderFileDTO> internalOrderFiles;
+
+    @JsonProperty("statusId")
+    @ApiModelProperty(example = "order-status-open", value = "Status of the order", required = true)
+    private String statusId;
+
+    @JsonProperty("dateOfReceiving")
+    @ApiModelProperty(example = "2020-09-11", required = true, value = "When was a candidate in the system created")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateOfReceiving;
 
     @EqualsAndHashCode(callSuper = true)
     @Data
@@ -130,7 +141,7 @@ public class InternalOrderDTO extends DefaultDTOObject {
 
         @JsonProperty("notes")
         @ApiModelProperty(example = "File is encrypted", value = "Notes with additional information")
-        private String notes;
+        private String note;
     }
 }
 

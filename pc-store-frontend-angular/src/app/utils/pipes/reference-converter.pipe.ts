@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {IdNamePair} from '../../internal-orders-overview/new-internal-orders/new-internal-orders.component';
+import {IdNamePair} from '../../internal-orders-overview/new-internal-order/new-internal-order.component';
 
 @Pipe({
   name: 'referenceConverter'

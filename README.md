@@ -19,4 +19,6 @@ Architecture:
 
 ### Angular
 
+[README](pc-store-frontend-angular/README.md)
+
 ### React

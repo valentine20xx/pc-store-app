@@ -29,6 +29,14 @@ import {MatInputModule} from '@angular/material/input';
 import {ReferenceConverterPipe} from './utils/pipes/reference-converter.pipe';
 import {AddDocumentToNewInternalOrderComponent} from './internal-orders-overview/new-internal-order/add-document-to-new-internal-order/add-document-to-new-internal-order.component';
 import {ErrorDialogComponent} from './error-dialog/error-dialog.component';
+import {StoreModule} from '@ngrx/store';
+import {EffectsModule} from '@ngrx/effects';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {InternalOrderEffects} from "./state/app.effects";
+import {appStateReducer, InternalOrdersState} from "./state/app.reducer";
+import {StoreDevtoolsModule} from "@ngrx/store-devtools";
+import {environment} from "../environments/environment";
+import {Stages} from "../environments/model";
 
 @NgModule({
   declarations: [
@@ -63,10 +71,22 @@ import {ErrorDialogComponent} from './error-dialog/error-dialog.component';
     MatStepperModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    StoreModule.forRoot<AppState>({internalOrdersState: appStateReducer}),
+    EffectsModule.forRoot([InternalOrderEffects]),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, // Retains last 25 states
+      logOnly: environment.stage == Stages.PROD, // Restrict extension to log-only mode
+      autoPause: true, // Pauses recording actions and state changes when the extension window is not open
+    }),
+    MatPaginatorModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
+}
+
+export interface AppState {
+  internalOrdersState: InternalOrdersState
 }

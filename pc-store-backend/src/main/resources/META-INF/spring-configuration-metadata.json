@@ -19,11 +19,11 @@
       "values": [
         {
           "value": "true",
-          "description": "Disable archiving."
+          "description": "Enable archiving."
         },
         {
           "value": "false",
-          "description": "Enable archiving."
+          "description": "Disable archiving."
         }
       ]
     },

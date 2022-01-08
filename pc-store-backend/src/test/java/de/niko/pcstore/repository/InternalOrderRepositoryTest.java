@@ -1,21 +1,14 @@
 package de.niko.pcstore.repository;
 
-import de.niko.pcstore.entity.GlobalVariableEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
-import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
-import de.niko.pcstore.entity.PersonalComputerEntity;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import javax.persistence.Query;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -25,12 +18,10 @@ import org.springframework.test.context.jdbc.Sql;
 public class InternalOrderRepositoryTest {
     @Autowired
     private InternalOrderRepository internalOrderRepository;
-    @Autowired
-    private TestEntityManager testEntityManager;
 
     @Test
     @DisplayName("Test findAll")
-    @Sql("/test-internal-orders.sql")
+    @Sql("/test-data.sql")
     public void findAllTest() {
         List<InternalOrderEntity> internalOrderEntities = internalOrderRepository.findAll();
 
@@ -44,7 +35,7 @@ public class InternalOrderRepositoryTest {
 
     @Test
     @DisplayName("Test findById")
-    @Sql("/test-internal-orders.sql")
+    @Sql("/test-data.sql")
     public void findByIdTest() {
         Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById("INTERNAL_ORDER_ID_1");
         Assertions.assertThat(internalOrderEntityOptional.isPresent()).isTrue();
@@ -54,5 +45,10 @@ public class InternalOrderRepositoryTest {
 
         internalOrderEntityOptional = internalOrderRepository.findById("not-found");
         Assertions.assertThat(internalOrderEntityOptional.isEmpty()).isTrue();
+    }
+
+    @BeforeEach
+    private void initializeDatabase() {
+        Assertions.assertThat(internalOrderRepository).isNotNull();
     }
 }

@@ -18,11 +18,15 @@
       <mat-label>Anmerkung</mat-label>
       <textarea appAutoTrim matInput cdkTextareaAutosize formControlName="note"
                 cdkAutosizeMinRows="1"
-                cdkAutosizeMaxRows="7"></textarea>
+                cdkAutosizeMaxRows="7"
+                (change)="onChangeNote($event)"></textarea>
     </mat-form-field>
 
     <div class="fileUpload">
-      <div class="fileUploadButton">
+      <div *ngIf="fileUploadForm.controls.file.hasError('not-selected')" class="fileUploadButtonError">
+        Drücken Sie, bitte hier, um eine Datei zu wählen
+      </div>
+      <div *ngIf="!fileUploadForm.controls.file.hasError('not-selected')" class="fileUploadButton">
         Drücken Sie, bitte hier, um eine Datei zu wählen
       </div>
       <input class="fileUploadInput" formControlName="file" type="file" (change)="onChangeFileInput($event)"/>

@@ -5,9 +5,6 @@ public class GlobalVariableApiLogMessages {
     public static final String ADD_GLOBAL_VARIABLE_OUTPUT = "addGlobalVariable > Output > constantDTO: {}";
     public static final String GET_GLOBAL_VARIABLES_INPUT = "getGlobalVariables > Input > types: {}";
     public static final String GET_GLOBAL_VARIABLES_OUTPUT = "getGlobalVariables > Output > constants: {}";
-    public static final String GET_CONSTANT_INPUT = "getConstant > Input > id: {}";
-    public static final String GET_CONSTANT_OUTPUT = "getConstant > Output > constant: {}";
-    public static final String GET_CONSTANT_OUTPUT_NOTFOUND = "getConstant > Output > Not found";
     public static final String DELETE_GLOBAL_VARIABLE_INPUT = "deleteConstant > Input > id: {}";
     public static final String DELETE_GLOBAL_VARIABLE_OUTPUT_OK = "deleteConstant > Output > OK";
     public static final String DELETE_GLOBAL_VARIABLE_OUTPUT_CONFLICT = "deleteConstant > Output > CONFLICT";

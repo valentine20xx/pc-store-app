@@ -161,7 +161,7 @@
     <mat-step label="Additional files" [editable]="stepper.selectedIndex !== (stepper.steps.length - 1)">
       <button style="margin-bottom: 1em;" mat-raised-button color="primary" (click)="addDocumentClick()">Add a document</button>
 
-      <table mat-table [dataSource]="documents" style="width: 100%;border-width: 1px 1px 0 1px;border-style: solid;border-color: rgba(255, 255, 255, 0.12);">
+      <table mat-table [dataSource]="documentsDataSource " style="width: 100%;border-width: 1px 1px 0 1px;border-style: solid;border-color: rgba(255, 255, 255, 0.12);">
         <ng-container matColumnDef="name" style="width: 30%">
           <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let element"> {{element.name}} </td>
@@ -211,15 +211,17 @@
       </div>
       <div class="final-section-item">
         <div class="final-section-title">Additional files:</div>
-        <div *ngFor="let document of documents">
-          <div class="final-section-sub-item">{{ document | json }}</div>
+        <div *ngFor="let document of this.documentsDataSource.data">
+          <div class="final-section-sub-item">Document: {{ document.name }}
+            <ng-container *ngIf="document.note != null">, Note: {{ document.note }}</ng-container>
+          </div>
         </div>
       </div>
     </mat-step>
   </mat-stepper>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-raised-button (click)="stepper.reset()">Reset</button>
+  <button mat-raised-button (click)="resetClick()">Reset</button>
 
   <ng-container *ngIf="stepper.selectedIndex !== 0 && stepper.selectedIndex !== (stepper.steps.length - 1)">
     <button mat-raised-button (click)="stepperPreviousClick()">Back</button>

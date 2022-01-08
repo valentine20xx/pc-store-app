@@ -31,6 +31,6 @@ ng test pc-store-frontend-angular --source-map
 - [ ] street + houseNumber: dynamic validation (upgrade fix)
 - [ ] UI Unit Tests
 - [ ] Refactor and upgrade fixing
-- [ ] Loader
-- 
+- [x] Loader
+- [ ] Error handler
 

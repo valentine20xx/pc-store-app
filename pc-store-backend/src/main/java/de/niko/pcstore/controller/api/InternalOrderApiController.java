@@ -9,11 +9,11 @@ import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.InternalOrderFilePayloadEntity;
 import de.niko.pcstore.logging.InternalOrderApiLogMessages;
-import de.niko.pcstore.repository.GlobalVariableRepository;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,40 +43,40 @@ public class InternalOrderApiController implements InternalOrderApi {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final InternalOrderRepository internalOrderRepository;
-    private final GlobalVariableRepository globalVariableRepository;
 
-    public InternalOrderApiController(InternalOrderRepository internalOrderRepository, ModelMapper modelMapper, ObjectMapper objectMapper, GlobalVariableRepository globalVariableRepository) {
+    public InternalOrderApiController(InternalOrderRepository internalOrderRepository, ModelMapper modelMapper, ObjectMapper objectMapper) {
         this.internalOrderRepository = internalOrderRepository;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
-        this.globalVariableRepository = globalVariableRepository;
     }
 
-    //    @Override
-//    public ResponseEntity<Object> deletePersonalComputer(String id) {
-//        if (StringUtils.isEmpty(id)) {
-//            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-//        } else {
-//            try {
-//                Optional<PersonalComputerEntity> personalComputerEntityOptional = personalComputerRepository.findById(id);
-//                if (personalComputerEntityOptional.isPresent()) {
-//                    PersonalComputerEntity personalComputerEntity = personalComputerEntityOptional.get();
-//
-//                    personalComputerEntity.setDateOfDeletion(new Timestamp(System.currentTimeMillis()));
-//
-//                    personalComputerRepository.saveAndFlush(personalComputerEntity);
-//
-//                    return new ResponseEntity<>(HttpStatus.OK);
-//                } else {
-//                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//                }
-//            } catch (org.springframework.dao.EmptyResultDataAccessException emptyResultDataAccessException) {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            } catch (Exception e) {
-//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-//    }
+    @Override
+    public ResponseEntity<Object> deleteGlobalVariable(String id) {
+        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(id);
+
+        if (StringUtils.isEmpty(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        } else {
+            try {
+                if (internalOrderEntityOptional.isPresent()) {
+                    InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+
+                    internalOrderEntity.setDateOfDeletion(new Timestamp(System.currentTimeMillis()));
+
+                    internalOrderRepository.saveAndFlush(internalOrderEntity);
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } catch (org.springframework.dao.EmptyResultDataAccessException emptyResultDataAccessException) {
+                emptyResultDataAccessException.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 
     @Override
     public ResponseEntity<List<InternalOrderShortDTO>> getAllInternalOrderList() {
@@ -93,11 +93,11 @@ public class InternalOrderApiController implements InternalOrderApi {
         Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(id);
 
         if (internalOrderEntityOptional.isPresent()) {
-            InternalOrderEntity personalComputerEntity = internalOrderEntityOptional.get();
-            InternalOrderDTO personalComputerDTO = modelMapper.map(personalComputerEntity, InternalOrderDTO.class);
+            InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+            InternalOrderDTO internalOrderDTO = modelMapper.map(internalOrderEntity, InternalOrderDTO.class);
 
-            log.info(InternalOrderApiLogMessages.GET_INTERNAL_ORDER_OUTPUT, personalComputerDTO);
-            return new ResponseEntity<>(personalComputerDTO, HttpStatus.OK);
+            log.info(InternalOrderApiLogMessages.GET_INTERNAL_ORDER_OUTPUT, internalOrderDTO);
+            return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
         } else {
             log.info(InternalOrderApiLogMessages.GET_INTERNAL_ORDER_OUTPUT_NOTFOUND);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -105,12 +105,15 @@ public class InternalOrderApiController implements InternalOrderApi {
     }
 
     @Override
-    public ResponseEntity<InternalOrderDTO> addInternalOrder(NewInternalOrderDTO internalOrderDTO) {
-        var internalOrderEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
-        var personalComputerSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
-        var candidateSavedDTO = modelMapper.map(personalComputerSavedEntity, InternalOrderDTO.class);
+    public ResponseEntity<InternalOrderDTO> addInternalOrder(NewInternalOrderDTO newInternalOrderDTO) {
+        var internalOrderEntity = modelMapper.map(newInternalOrderDTO, InternalOrderEntity.class);
+        internalOrderEntity.setStatusId("order-status-open");
+        internalOrderEntity.setDateOfReceiving(LocalDate.now());
 
-        return new ResponseEntity<>(candidateSavedDTO, HttpStatus.OK);
+        var internalOrderSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
+        var internalOrderDTO = modelMapper.map(internalOrderSavedEntity, InternalOrderDTO.class);
+
+        return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
     }
 
     public static final String ADD_INTERNAL_ORDER_MULTIPART = "/internal-order-multipart";
@@ -130,7 +133,6 @@ public class InternalOrderApiController implements InternalOrderApi {
 
         if (candidateFileDTOOptional.isPresent()) {
             InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = candidateFileDTOOptional.get();
-//            String id = internalOrderFileDTO.getId();
 
             Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(internalOrderId);
 

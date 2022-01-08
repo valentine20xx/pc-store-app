@@ -4,6 +4,7 @@ import de.niko.pcstore.entity.GlobalVariableEntity;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +42,10 @@ public class GlobalVariableRepositoryTest {
 
         globalVariableEntityOptional = globalVariableRepository.findById("not-found");
         Assertions.assertThat(globalVariableEntityOptional.isEmpty()).isTrue();
+    }
+
+    @BeforeEach
+    private void initializeDatabase() {
+        Assertions.assertThat(globalVariableRepository).isNotNull();
     }
 }

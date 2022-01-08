@@ -45,10 +45,18 @@ body {
 
 .main-section {
   padding: 0.5em;
-}
 
-.section {
-  margin: 0.5em;
+  .section {
+    margin: 0.5em;
+
+    .ui-button {
+      margin-right: 0.5em;
+    }
+  }
+
+  .section:not(:first-child) {
+    padding-top: 0.5em;
+  }
 }
 
 .footer-section {
@@ -59,9 +67,11 @@ body {
 
 .final-section-item {
   margin-bottom: 1em;
+
   .final-section-title {
     font-size: x-large;
   }
+
   .final-section-sub-item {
     padding-left: 2em;
   }

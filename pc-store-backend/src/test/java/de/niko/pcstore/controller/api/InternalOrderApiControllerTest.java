@@ -4,7 +4,6 @@ import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
-import de.niko.pcstore.repository.GlobalVariableRepository;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import java.io.File;
 import java.util.HashMap;
@@ -51,10 +50,6 @@ public class InternalOrderApiControllerTest {
     private InternalOrderRepository internalOrderRepository;
 
     @Autowired
-//    @Qualifier("globalVariableRepository")
-    private GlobalVariableRepository globalVariableRepository;
-
-    @Autowired
     private TestEntityManager testEntityManager;
 
     @Autowired
@@ -69,7 +64,7 @@ public class InternalOrderApiControllerTest {
     @Test
     @DisplayName("Test upload")
     @Transactional
-    @Sql("/test-internal-orders.sql")
+    @Sql("/test-data.sql")
     public void uploadTest() {
         String BASE_URI = "http://localhost:" + port;
 
@@ -121,7 +116,7 @@ public class InternalOrderApiControllerTest {
     @Test
     @DisplayName("Test addInternalOrderMultipart + download")
     @Transactional // a Session is needed (otherwise: failed to lazily initialize)
-    @Sql("/test-internal-orders.sql")
+    @Sql("/test-data.sql")
     public void addInternalOrderMultipartTest() {
         String BASE_URI = "http://localhost:" + port;
 
@@ -154,7 +149,7 @@ public class InternalOrderApiControllerTest {
             Assertions.assertThat(internalOrderSavedDTO).isNotNull();
             Assertions.assertThat(internalOrderSavedDTO.getId()).isNotNull();
             Assertions.assertThat(internalOrderSavedDTO.getVersion()).isNotNull();
-//            Assertions.assertThat(internalOrderSavedDTO.getStatusId()).isEqualTo("order-status-open");
+            Assertions.assertThat(internalOrderSavedDTO.getStatusId()).isEqualTo("order-status-open");
             Assertions.assertThat(internalOrderSavedDTO.getDateOfReceiving()).isNotNull();
 
             personalComputerSavedId = internalOrderSavedDTO.getId();
@@ -163,7 +158,6 @@ public class InternalOrderApiControllerTest {
 
             Assertions.assertThat(internalOrderFiles).isNotNull();
             Assertions.assertThat(internalOrderFiles.size()).isEqualTo(1);
-
 
             idForDownload = internalOrderFiles.get(0).getId();
         }

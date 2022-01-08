@@ -28,7 +28,7 @@ public interface GlobalVariableApi {
     String UPDATE_GLOBAL_VARIABLE = "/global-variable";
     String DELETE_GLOBAL_VARIABLE = "/global-variable/{id}";
 
-    @ApiOperation(value = "Add a new constant")
+    @ApiOperation(value = "Add a new global variable")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "item created"),
             @ApiResponse(code = 400, message = "invalid input, object invalid"),
@@ -38,7 +38,7 @@ public interface GlobalVariableApi {
             method = RequestMethod.POST)
     ResponseEntity<GlobalVariableDTO> addGlobalVariable(@ApiParam(value = "Source item to add") @RequestBody GlobalVariableDTO globalVariableDTO);
 
-    @ApiOperation(value = "Get all values for dropdown-fields", response = GlobalVariableDTO.class, responseContainer = "List")
+    @ApiOperation(value = "Get all global variables", response = GlobalVariableDTO.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "search results matching criteria", response = GlobalVariableDTO.class, responseContainer = "List")})
     @RequestMapping(value = GET_GLOBAL_VARIABLES,
@@ -55,16 +55,16 @@ public interface GlobalVariableApi {
 //            method = RequestMethod.GET)
 //    ResponseEntity<ConstantDTO> getConstant(@ApiParam(value = "pass the id of the constant you want to have", required = true) @PathVariable("id") String id);
 //
-    @ApiOperation(value = "Delete a constant")
+    @ApiOperation(value = "Delete a global variable")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "item deleted"),
             @ApiResponse(code = 404, message = "an item is already deleted"),
             @ApiResponse(code = 409, message = "an item is not deletable")})
     @RequestMapping(value = DELETE_GLOBAL_VARIABLE,
             method = RequestMethod.DELETE)
-    ResponseEntity<Object> deleteGlobalVariable(@ApiParam(value = "pass the id of the constant you want to delete", required = true) @PathVariable("id") String id);
+    ResponseEntity<Object> deleteGlobalVariable(@ApiParam(value = "pass the id of the global variable you want to delete", required = true) @PathVariable("id") String id);
 
-    @ApiOperation(value = "Update a constant")
+    @ApiOperation(value = "Update a global variable")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "item updated"),
             @ApiResponse(code = 400, message = "invalid input, object invalid"),

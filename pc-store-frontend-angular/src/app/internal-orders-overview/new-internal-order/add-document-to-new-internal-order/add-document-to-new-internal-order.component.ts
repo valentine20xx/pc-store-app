@@ -48,19 +48,23 @@ export class AddDocumentToNewInternalOrderComponent {
     this.newDocument.name = event;
   }
 
+  onChangeNote(event: any): void {
+    this.newDocument.note = event.target.value;
+  }
+
   onCancelClick(): void {
     this.dialogRef.close({button: Buttons.CLOSE});
   }
 
   onSubmitClick(): void {
-    if(this.fileUploadForm.valid){
-
-    }else {
-
+    if (this.newDocument.file == null) {
+      this.fileUploadForm.controls['file'].setErrors({'not-selected': true});
     }
 
-    // this.newDocument.button = Buttons.UPLOAD;
-    // this.dialogRef.close(this.newDocument);
+    if (this.fileUploadForm.valid) {
+      this.newDocument.button = Buttons.UPLOAD;
+      this.dialogRef.close({...this.newDocument});
+    }
   }
 }
 

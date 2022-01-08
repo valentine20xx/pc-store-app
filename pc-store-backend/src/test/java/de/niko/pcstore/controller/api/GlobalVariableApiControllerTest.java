@@ -17,6 +17,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -35,17 +36,19 @@ public class GlobalVariableApiControllerTest {
     private GlobalVariableApi globalVariableApi;
 
     @Test
-    @DisplayName("Test getGlobalVariablesTest")
+    @DisplayName("Test getGlobalVariables")
 //    @Transactional // a Session is needed (otherwise: failed to lazily initialize)
+    @Sql("/test-data.sql")
     public void getGlobalVariablesTest() {
-        ResponseEntity<List<GlobalVariableDTO>> responseEntity = globalVariableApi.getGlobalVariables(List.of("GVE-type-1", "GVE-type-2"));
+//        ResponseEntity<List<GlobalVariableDTO>> responseEntity = globalVariableApi.getGlobalVariables(List.of("GVE-type-1", "GVE-type-2"));
+        ResponseEntity<List<GlobalVariableDTO>> responseEntity = globalVariableApi.getGlobalVariables(List.of("order-status", "salutations"));
 
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         List<GlobalVariableDTO> globalVariableDTOList = responseEntity.getBody();
         Assertions.assertThat(globalVariableDTOList).isNotNull();
-        Assertions.assertThat(globalVariableDTOList.size()).isEqualTo(3);
+        Assertions.assertThat(globalVariableDTOList.size()).isEqualTo(7);
 
         globalVariableDTOList.forEach(globalVariableDTO -> {
             String id = globalVariableDTO.getId();
@@ -64,17 +67,17 @@ public class GlobalVariableApiControllerTest {
         });
     }
 
-    @BeforeEach
-    private void initializeDatabase() {
-        Assertions.assertThat(port).isNotNull();
-        Assertions.assertThat(testRestTemplate).isNotNull();
-        Assertions.assertThat(globalVariableRepository).isNotNull();
-
-        GlobalVariableEntity globalVariableEntity1 = GlobalVariableEntity.builder().type("GVE-type-1").subtype("GVE-subtype-1").name("GVE-name-1").deletable(true).build();
-        GlobalVariableEntity globalVariableEntity1_2 = GlobalVariableEntity.builder().type("GVE-type-1").subtype("GVE-subtype-2").name("GVE-name-2").deletable(true).build();
-        GlobalVariableEntity globalVariableEntity2 = GlobalVariableEntity.builder().type("GVE-type-2").subtype("GVE-subtype-2").name("GVE-name-2").deletable(false).build();
-        GlobalVariableEntity globalVariableEntity3 = GlobalVariableEntity.builder().type("GVE-type-3").subtype("GVE-subtype-3").name("GVE-name-3").deletable(true).dateOfDeletion(new Timestamp(System.currentTimeMillis())).build();
-
-        globalVariableRepository.saveAllAndFlush(List.of(globalVariableEntity1, globalVariableEntity1_2, globalVariableEntity2, globalVariableEntity3));
-    }
+//    @BeforeEach
+//    private void initializeDatabase() {
+//        Assertions.assertThat(port).isNotNull();
+//        Assertions.assertThat(testRestTemplate).isNotNull();
+//        Assertions.assertThat(globalVariableRepository).isNotNull();
+//
+//        GlobalVariableEntity globalVariableEntity1 = GlobalVariableEntity.builder().type("GVE-type-1").subtype("GVE-subtype-1").name("GVE-name-1").deletable(true).build();
+//        GlobalVariableEntity globalVariableEntity1_2 = GlobalVariableEntity.builder().type("GVE-type-1").subtype("GVE-subtype-2").name("GVE-name-2").deletable(true).build();
+//        GlobalVariableEntity globalVariableEntity2 = GlobalVariableEntity.builder().type("GVE-type-2").subtype("GVE-subtype-2").name("GVE-name-2").deletable(false).build();
+//        GlobalVariableEntity globalVariableEntity3 = GlobalVariableEntity.builder().type("GVE-type-3").subtype("GVE-subtype-3").name("GVE-name-3").deletable(true).dateOfDeletion(new Timestamp(System.currentTimeMillis())).build();
+//
+//        globalVariableRepository.saveAllAndFlush(List.of(globalVariableEntity1, globalVariableEntity1_2, globalVariableEntity2, globalVariableEntity3));
+//    }
 }

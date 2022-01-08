@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "GlobalVariable", uniqueConstraints = {@UniqueConstraint(columnNames = {"type", "subtype"})})
+@Table(name = "GlobalVariable")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -61,7 +61,9 @@ maven command: `mvn clean package -Pprod`
 - [x] One-request creation.
 - [ ] CRON work for archiving.
 - [ ] Swagger: ordering in json objects order.
-- [ ] Add client data
+- [x] Add client data
+- [x] Database initialization for tests
+- [ ] Split ApiControllers into service and controller 
 
 ### Others
 

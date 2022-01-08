@@ -25,9 +25,17 @@ public interface InternalOrderApi {
 
     String GET_INTERNAL_ORDER = "/internal-order/{id}";
     String ADD_INTERNAL_ORDER = "/internal-order";
-//    String UPDATE_PERSONAL_COMPUTER = "/personal-computer";
-//    String DELETE_PERSONAL_COMPUTER = "/personal-computer/{id}";
+    String UPDATE_INTERNAL_ORDER = "/internal-order";
+    String DELETE_INTERNAL_ORDER = "/internal-order/{id}";
 
+    @ApiOperation(value = "Delete a internal order")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "item deleted"),
+            @ApiResponse(code = 404, message = "an item is already deleted"),
+            @ApiResponse(code = 409, message = "an item is not deletable")})
+    @RequestMapping(value = DELETE_INTERNAL_ORDER,
+            method = RequestMethod.DELETE)
+    ResponseEntity<Object> deleteGlobalVariable(@ApiParam(value = "pass the id of the internal order you want to delete", required = true) @PathVariable("id") String id);
 
     @ApiOperation(value = "Get all internal orders", response = InternalOrderShortDTO.class, responseContainer = "List")
     @ApiResponses(value = {

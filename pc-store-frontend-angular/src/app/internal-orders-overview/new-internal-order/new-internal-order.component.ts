@@ -4,6 +4,8 @@ import {FormBuilder} from "@angular/forms";
 import {MatStepper} from "@angular/material/stepper";
 import {AddDocumentOutput, AddDocumentToNewInternalOrderComponent, Buttons} from "./add-document-to-new-internal-order/add-document-to-new-internal-order.component";
 import {generateId} from "../../utils/utils";
+import {MatTableDataSource} from "@angular/material/table";
+import {InternalOrderShortDTO} from "../../model/model";
 
 @Component({
   selector: 'app-new-internal-order',
@@ -71,10 +73,7 @@ export class NewInternalOrderComponent {
   });
 
   documentsDisplayedColumns: string[] = ['name', 'note', 'actions'];
-  documents: Document[] = [
-    {name: 'file1', note: 'Quittung 1'},
-    {name: 'file2', note: 'Quittung 2'}
-  ];
+  documentsDataSource = new MatTableDataSource<Document>();
 
   salutations: IdNamePair[] = [
     {id: 'salutations-herr', name: 'Herr'},
@@ -83,8 +82,10 @@ export class NewInternalOrderComponent {
 
   constructor(private formBuilder: FormBuilder,
               private dialog: MatDialog,
-              private dialogRef: MatDialogRef<any, AddDocumentOutput>,
+              private dialogRef: MatDialogRef<any, InternalOrderShortDTO>,
               @Inject(MAT_DIALOG_DATA) public input: any) {
+
+    this.documentsDataSource.data = [];
   }
 
   stepperNextClick(): void {
@@ -96,7 +97,19 @@ export class NewInternalOrderComponent {
   }
 
   newInternalOrderCreate(): void {
-    this.dialogRef.close();
+    this.dialogRef.close({
+      id: generateId(),
+      version: new Date(),
+      client: `${this.clientDataForm.controls['surname'].value}, ${this.clientDataForm.controls['name'].value}`,
+      personalComputer: `${this.personalComputerForm.controls['processor'].value}, ${this.personalComputerForm.controls['graphicsCard'].value}`,
+      status: 'order-status-open',
+      dateOfReceiving: new Date()
+    });
+  }
+
+  resetClick(): void {
+    this.stepper.reset();
+    this.documentsDataSource.data = [];
   }
 
   addDocumentClick(): void {
@@ -106,12 +119,13 @@ export class NewInternalOrderComponent {
       disableClose: true
     }).afterClosed().subscribe(result => {
       if (result && result.button == Buttons.UPLOAD) {
-        this.documents.push({
+
+        this.documentsDataSource.data = [...this.documentsDataSource.data, {
           id: generateId(),
           name: result.name,
           note: result.note,
           file: result.file
-        })
+        }];
       }
     });
   }

@@ -29,8 +29,7 @@
               "src/assets/favicons"
             ],
             "styles": [
-              "src/styles.css",
-              "src/custom.scss"
+              "src/style.scss"
             ],
             "scripts": []
           },
@@ -112,7 +111,7 @@
               "src/assets/favicons"
             ],
             "styles": [
-              "src/styles.css"
+              "src/style.scss"
             ],
             "scripts": []
           }

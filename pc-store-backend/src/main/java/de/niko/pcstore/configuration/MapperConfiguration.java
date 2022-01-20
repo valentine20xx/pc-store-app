@@ -89,7 +89,7 @@ public class MapperConfiguration {
             String id = internalOrderEntity.getId();
             Timestamp version = internalOrderEntity.getVersion();
 
-            String statusId = internalOrderEntity.getStatusId();
+            String status = internalOrderEntity.getStatus().toString();
             LocalDate dateOfReceiving = internalOrderEntity.getDateOfReceiving();
 
             return InternalOrderShortDTO.builder()
@@ -98,7 +98,7 @@ public class MapperConfiguration {
                     .client(surname + ", " + name)
                     .personalComputer(processor + ", " + graphicsCard)
                     .dateOfReceiving(dateOfReceiving)
-                    .statusId(statusId)
+                    .status(InternalOrderShortDTO.Status.fromString(status))
                     .build();
         }
     }

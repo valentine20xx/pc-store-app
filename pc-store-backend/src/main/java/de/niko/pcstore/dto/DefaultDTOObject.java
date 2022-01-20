@@ -14,13 +14,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 //@ApiModel
 @SuperBuilder
-public class DefaultDTOObject {
+public abstract class DefaultDTOObject {
     @JsonProperty("id")
-    @ApiModelProperty(example = "d290f1ee-6c54-4b01-90e6-d701748f0851", value = "Unique UUID")
+    @ApiModelProperty(example = "d290f1ee-6c54-4b01-90e6-d701748f0851", value = "Unique UUID", required = true)
     private String id;
 
     @JsonProperty("version")
-    @ApiModelProperty(example = "2021-11-23T10:03:38.538", value = "Date of the last change")
+    @ApiModelProperty(example = "2021-11-23T10:03:38.538", value = "Date of the last change", required = true)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private Timestamp version;
 }

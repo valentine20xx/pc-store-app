@@ -21,11 +21,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class ClientDataEntity extends DefaultPersistenceObject {
-    @JoinColumn(name = "salutation_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private GlobalVariableEntity salutationObject;
-    @Column(name = "salutation_id")
-    private String salutationId;
+    @Column
+    private String salutation;
     @Column
     private String name;
     @Column
@@ -44,11 +41,4 @@ public class ClientDataEntity extends DefaultPersistenceObject {
     private String cellphone;
     @Column
     private String email;
-    /*
- @JoinColumn(name = "category_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private ConstantEntity categoryObject;
-    @Column(name = "category_id")
-    private String categoryId;
- */
 }

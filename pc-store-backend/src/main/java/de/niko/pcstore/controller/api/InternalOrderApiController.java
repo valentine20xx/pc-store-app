@@ -107,13 +107,34 @@ public class InternalOrderApiController implements InternalOrderApi {
     @Override
     public ResponseEntity<InternalOrderDTO> addInternalOrder(NewInternalOrderDTO newInternalOrderDTO) {
         var internalOrderEntity = modelMapper.map(newInternalOrderDTO, InternalOrderEntity.class);
-        internalOrderEntity.setStatusId("order-status-open");
+        internalOrderEntity.setStatus(InternalOrderEntity.Status.OPEN);
         internalOrderEntity.setDateOfReceiving(LocalDate.now());
 
         var internalOrderSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
         var internalOrderDTO = modelMapper.map(internalOrderSavedEntity, InternalOrderDTO.class);
 
         return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> updateInternalOrderStatus(String internalOrderId, InternalOrderDTO.Status status) {
+        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(internalOrderId);
+
+        if (internalOrderEntityOptional.isPresent()) {
+            InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+
+            if (internalOrderEntity.getStatus() == InternalOrderEntity.Status.fromString(status.getStatus())) {
+                return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+            }
+
+            internalOrderEntity.setStatus(InternalOrderEntity.Status.fromString(status.getStatus()));
+
+            internalOrderRepository.saveAndFlush(internalOrderEntity);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     public static final String ADD_INTERNAL_ORDER_MULTIPART = "/internal-order-multipart";
@@ -225,7 +246,7 @@ public class InternalOrderApiController implements InternalOrderApi {
             InternalOrderDTO internalOrderDTO = internalOrderDTOOptional.get();
 
             InternalOrderEntity internalOrderEntity = modelMapper.map(internalOrderDTO, InternalOrderEntity.class);
-            internalOrderEntity.setStatusId("order-status-open");
+            internalOrderEntity.setStatus(InternalOrderEntity.Status.OPEN);
             internalOrderEntity.setDateOfReceiving(LocalDate.now());
 
             Set<InternalOrderFileMetadataEntity> internalOrderFileMetadataEntities = internalOrderEntity.getInternalOrderFileMetadataEntities();

@@ -35,8 +35,6 @@ public class SwaggerDocumentationConfig {
                 .contact(new Contact("", "", ""))
                 .build();
 
-//        Tag personalComputerAPITag = new Tag(Tags.PERSONAL_COMPUTER_API, "API for manipulations with personal computers");
-        Tag globalVariableAPITag = new Tag(Tags.GLOBAL_VARIABLE_API_TAG, "API for manipulations with global variables");
         Tag internalOrderAPITag = new Tag(Tags.INTERNAL_ORDER_API_TAG, "API for manipulations with internal orders");
 
         return new Docket(DocumentationType.SWAGGER_2)
@@ -45,7 +43,6 @@ public class SwaggerDocumentationConfig {
                 .apis(RequestHandlerSelectors.basePackage("de.niko.pcstore.controller.api"))
                 .build()
                 .tags(internalOrderAPITag)
-                .tags(globalVariableAPITag)
                 .directModelSubstitute(LocalDate.class, Date.class)
                 .directModelSubstitute(OffsetDateTime.class, Date.class)
                 .directModelSubstitute(Timestamp.class, Date.class)

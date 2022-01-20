@@ -5,7 +5,7 @@ import {MatStepper} from "@angular/material/stepper";
 import {AddDocumentOutput, AddDocumentToNewInternalOrderComponent, Buttons} from "./add-document-to-new-internal-order/add-document-to-new-internal-order.component";
 import {generateId} from "../../utils/utils";
 import {MatTableDataSource} from "@angular/material/table";
-import {InternalOrderShortDTO} from "../../model/model";
+import {getSalutations, InternalOrderShortDTO} from "../../model/model";
 
 @Component({
   selector: 'app-new-internal-order',
@@ -75,10 +75,7 @@ export class NewInternalOrderComponent {
   documentsDisplayedColumns: string[] = ['name', 'note', 'actions'];
   documentsDataSource = new MatTableDataSource<Document>();
 
-  salutations: IdNamePair[] = [
-    {id: 'salutations-herr', name: 'Herr'},
-    {id: 'salutations-frau', name: 'Frau'}
-  ];
+  salutations = getSalutations();
 
   constructor(private formBuilder: FormBuilder,
               private dialog: MatDialog,
@@ -102,7 +99,7 @@ export class NewInternalOrderComponent {
       version: new Date(),
       client: `${this.clientDataForm.controls['surname'].value}, ${this.clientDataForm.controls['name'].value}`,
       personalComputer: `${this.personalComputerForm.controls['processor'].value}, ${this.personalComputerForm.controls['graphicsCard'].value}`,
-      status: 'order-status-open',
+      status: 'open',
       dateOfReceiving: new Date()
     });
   }
@@ -129,11 +126,6 @@ export class NewInternalOrderComponent {
       }
     });
   }
-}
-
-export interface IdNamePair {
-  id: string;
-  name: string;
 }
 
 export interface Document {

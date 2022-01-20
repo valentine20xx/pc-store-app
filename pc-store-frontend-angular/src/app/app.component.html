@@ -3,7 +3,6 @@
     <h2 style="text-align: center;">Menu</h2>
 
     <mat-nav-list>
-      <mat-list-item (click)="globalVariablesMenuButtonClick()">Global variables</mat-list-item>
       <mat-list-item (click)="internalOrdersOverviewButtonClick()">Internal orders</mat-list-item>
     </mat-nav-list>
   </mat-sidenav>
@@ -26,7 +25,7 @@
           </button>
         </ng-container>
 
-        <div style="word-wrap: break-word;text-align: center; font-weight: bold; font-size: 1.5em" fxFlex="1 1 auto;">PC Store</div>
+        <div class="main-title" fxFlex="1 1 auto;">PC Store</div>
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>more_vert</mat-icon>
         </button>

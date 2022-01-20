@@ -1,11 +1,11 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {IdNamePair} from '../../internal-orders-overview/new-internal-order/new-internal-order.component';
+import {IdValuePair} from '../../model/model';
 
 @Pipe({
   name: 'referenceConverter'
 })
 export class ReferenceConverterPipe implements PipeTransform {
-  transform(value: string, objects: IdNamePair[] | null): string {
+  transform(value: string, objects: IdValuePair[] | null): string {
     if (objects == null) {
       return '';
     } else {
@@ -14,7 +14,7 @@ export class ReferenceConverterPipe implements PipeTransform {
       if (object == null) {
         return '';
       } else {
-        return object.name
+        return object.value
       }
     }
   }

@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {NewInternalOrderComponent} from './new-internal-order/new-internal-order.component';
-import {InternalOrderShortDTO} from "../model/model";
+import {getInternalOrderStatuses, InternalOrderShortDTO} from "../model/model";
 import {Store} from "@ngrx/store";
-import {Subscription} from "rxjs";
+import {skip, Subscription} from "rxjs";
 import {MatTableDataSource} from "@angular/material/table";
 import {LoaderService} from "../utils/loader.service";
 import {ErrorOverlayService} from "../utils/error-overlay.service";
@@ -26,6 +26,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
   @ViewChild(MatSort) sort!: MatSort;
 
   one?: Subscription;
+  statuses = getInternalOrderStatuses();
 
   constructor(private store: Store<AppState>,
               private dialog: MatDialog,
@@ -34,7 +35,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
   }
 
   ngOnInit(): void {
-    this.one = this.store.select(state => state).subscribe(value => {
+    this.one = this.store.select(state => state).pipe(skip(1)).subscribe(value => {
         console.log('one subscription=', value);
         this.internalOrderShortDataSource.data = value.internalOrdersState.internalOrders;
         value.internalOrdersState.loading ? this.loaderService.showSpinner() : this.loaderService.hideSpinner();

@@ -14,11 +14,11 @@ import lombok.experimental.SuperBuilder;
 @ApiModel
 @SuperBuilder
 public class ErrorDTO {
-    @JsonProperty(value = "code")
+    @JsonProperty
     @ApiModelProperty(example = "1", required = true, value = "Code of the error")
     private Integer code;
 
-    @JsonProperty(value = "message")
+    @JsonProperty
     @ApiModelProperty(example = "Error occurred", value = "Message of the error")
     private String message;
 }

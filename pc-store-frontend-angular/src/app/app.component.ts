@@ -18,12 +18,6 @@ export class AppComponent {
               @Inject('IS_PRODUCTION') public isProduction: boolean) {
   }
 
-  globalVariablesMenuButtonClick(): void {
-    this.router.navigate(['/global-variables-overview'], {relativeTo: this.route}).then(() => {
-      this.mainSidenav.close().then(value => value);
-    });
-  }
-
   internalOrdersOverviewButtonClick(): void {
     this.router.navigate(['/internal-orders-overview'], {relativeTo: this.route}).then(() => {
       this.mainSidenav.close().then(value => value);

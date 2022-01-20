@@ -1,12 +1,7 @@
 package de.niko.pcstore.entity;
 
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,15 +31,4 @@ public class PersonalComputerEntity extends DefaultPersistenceObject {
     private String storageDevice;
     @Column
     private String powerSupplyUnit;
-//    PSU [Power Supply Unit]
-//    Display device, Monitor
-//    Operating System [OS]
-//    Input Devices, Mouse, Keyboard
-
-
-//    @JoinColumn(name = "category_id", insertable = false, updatable = false)
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    private ConstantEntity categoryObject;
-//    @Column(name = "category_id")
-//    private String categoryId;
 }

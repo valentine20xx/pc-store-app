@@ -38,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 @AutoConfigureTestEntityManager
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@DisplayName("Test PersonalComputerApiController")
+@DisplayName("Test InternalOrderApiController")
 public class InternalOrderApiControllerTest {
     @LocalServerPort
     private int port;
@@ -60,6 +60,53 @@ public class InternalOrderApiControllerTest {
 
     @Autowired
     private ServletContext servletContext;
+
+    @Test
+    @DisplayName("Test updateInternalOrderStatus")
+    @Transactional
+    @Sql("/test-data.sql")
+    public void updateInternalOrderStatusTest() {
+//        String BASE_URI = "http://localhost:" + port;
+//        String url = BASE_URI + InternalOrderApi.UPDATE_INTERNAL_ORDER_STATUS;
+//        Map<String, String> urlVariables = new HashMap<>();
+//        urlVariables.put("id", "INTERNAL_ORDER_ID_1");
+//        urlVariables.put("status", "producing");
+//        ResponseEntity<Object> responseEntity = testRestTemplate.getForEntity(url + "?id=INTERNAL_ORDER_ID_1&status=producing", Object.class);
+        {
+            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
+
+            Assertions.assertThat(responseEntity).isNotNull();
+            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+
+            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.OPEN);
+        }
+        {
+            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
+
+            Assertions.assertThat(responseEntity).isNotNull();
+            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        }
+        {
+            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
+
+            Assertions.assertThat(responseEntity).isNotNull();
+            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+
+            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.PRODUCING);
+        }
+        {
+            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
+
+            Assertions.assertThat(responseEntity).isNotNull();
+            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
+        }
+    }
 
     @Test
     @DisplayName("Test upload")
@@ -149,7 +196,7 @@ public class InternalOrderApiControllerTest {
             Assertions.assertThat(internalOrderSavedDTO).isNotNull();
             Assertions.assertThat(internalOrderSavedDTO.getId()).isNotNull();
             Assertions.assertThat(internalOrderSavedDTO.getVersion()).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getStatusId()).isEqualTo("order-status-open");
+            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.OPEN);
             Assertions.assertThat(internalOrderSavedDTO.getDateOfReceiving()).isNotNull();
 
             personalComputerSavedId = internalOrderSavedDTO.getId();

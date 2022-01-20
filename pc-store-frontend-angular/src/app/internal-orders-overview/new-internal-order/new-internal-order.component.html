@@ -73,7 +73,7 @@
               <mat-label>Anrede</mat-label>
               <mat-select formControlName="salutation">
                 <mat-option *ngFor="let salutation of salutations" [value]="salutation.id">
-                  {{salutation.name}}
+                  {{salutation.value}}
                 </mat-option>
               </mat-select>
               <mat-error *ngIf="clientDataForm.controls.salutation.hasError('required')">

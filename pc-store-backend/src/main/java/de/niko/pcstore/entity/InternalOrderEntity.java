@@ -1,10 +1,16 @@
 package de.niko.pcstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -38,10 +44,38 @@ public class InternalOrderEntity extends DefaultPersistenceObject {
 
     @Column
     private LocalDate dateOfReceiving;
-    // TODO new fields
-    @JoinColumn(name = "status_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
-    private GlobalVariableEntity statusObject;
-    @Column(name = "status_id")
-    private String statusId;
+
+    @Column
+    private Boolean privacyPolicy;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    public enum Status {
+        OPEN("open"), CHECKED("checked"), PRODUCING("producing"), PRODUCED("produced"), SENT("sent"), CLOSED("closed");
+
+        private final String status;
+
+        Status(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return this.status;
+        }
+
+        @JsonCreator
+        public static Status fromString(String status) {
+            Optional<Status> statusOptional = Arrays.stream(Status.values()).filter(o -> o.status.equalsIgnoreCase(status)).findFirst();
+
+            return statusOptional.orElse(null);
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(status);
+        }
+    }
 }

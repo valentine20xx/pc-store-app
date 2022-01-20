@@ -1,42 +1,35 @@
-import {Injectable} from "@angular/core";
-import {Actions, createEffect, ofType} from "@ngrx/effects";
-import {delay, of, switchMap} from "rxjs";
-import {generateId} from "../utils/utils";
-import {loadInternalOrders, loadInternalOrdersFailure, loadInternalOrdersSuccess} from "./app.actions";
+import {Injectable} from '@angular/core';
+import {Actions, createEffect, ofType} from '@ngrx/effects';
+import {catchError, of, switchMap} from 'rxjs';
+import {loadInternalOrders, loadInternalOrdersFailure, loadInternalOrdersSuccess} from './app.actions';
+import {InternalOrdersService} from '../services/internal-orders.service';
 
 @Injectable()
 export class InternalOrderEffects {
-  constructor(private actions$: Actions) {
+  constructor(private actions$: Actions,
+              private internalOrdersService: InternalOrdersService) {
   }
-
-  counter = 1;
 
   loadInternalOrders = createEffect(() =>
     this.actions$.pipe(
       ofType(loadInternalOrders.type),
-      delay(2000),
       switchMap(() => {
-          if (this.counter > 2) {
-            this.counter = 1;
-
-            return of(loadInternalOrdersSuccess({
-              payload: {
-                internalOrders: [{
-                  id: generateId(),
-                  version: new Date(),
-                  client: 'Ololo, Trololo',
-                  personalComputer: 'I7, 6700XT',
-                  status: 'open',
-                  dateOfReceiving: new Date(),
-                }],
-                loading: false,
-                hasError: false
+          return this.internalOrdersService.getInternalOrders().pipe(
+            switchMap(
+              value => {
+                return of(loadInternalOrdersSuccess({
+                  payload: {
+                    internalOrders: value,
+                    loading: false,
+                    hasError: false
+                  }
+                }));
               }
-            }));
-          } else {
-            this.counter += 1;
-            return of(loadInternalOrdersFailure());
-          }
+            ),
+            catchError(() =>
+              of(loadInternalOrdersFailure())
+            )
+          );
         }
       )
     )

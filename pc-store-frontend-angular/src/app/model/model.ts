@@ -1,3 +1,5 @@
+import {Observable, of} from "rxjs";
+
 export interface InternalOrderShortDTO extends DefaultDTOObject {
   client: string;
   personalComputer: string;
@@ -25,4 +27,17 @@ export interface PersonalComputerDTO extends DefaultDTOObject {
 export interface DefaultDTOObject {
   id: string;
   version: Date;
+}
+
+export interface IdValuePair {
+  id: string;
+  value: string;
+}
+
+export function getInternalOrderStatuses(): IdValuePair[] {
+  return [{id: 'open', value: 'Open'}];
+}
+
+export function getSalutations(): IdValuePair[] {
+  return [{id: 'male', value: 'Male'}, {id: 'female', value: 'Female'}];
 }

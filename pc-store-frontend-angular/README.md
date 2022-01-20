@@ -21,7 +21,7 @@ ng test pc-store-frontend-angular --source-map
 - Angular:
   - Material: https://material.angular.io/
   - Material icons: https://fonts.google.com/icons
-  - Flex: https://github.com/angular/flex-layout
+  - Flex: https://github.com/angular/flex-layout, https://www.angularjswiki.com/flexlayout/basics/
 
 ### To-do-Liste
 

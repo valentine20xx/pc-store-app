@@ -160,17 +160,17 @@ public class MapperConfigurationTest {
                 .personalComputer(PersonalComputerEntity.builder().processor(processor).graphicsCard(graphicsCard).build())
                 .clientData(ClientDataEntity.builder().name(name).surname(surname).build())
                 .dateOfReceiving(dateOfReceiving)
-                .statusId("order-status-open")
+                .status(InternalOrderEntity.Status.OPEN)
                 .build();
 
-        InternalOrderShortDTO personalComputerShortDTO = modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class);
+        InternalOrderShortDTO internalOrderShortDTO = modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class);
 
-        Assertions.assertThat(personalComputerShortDTO).isNotNull();
-        Assertions.assertThat(personalComputerShortDTO.getId()).isNotNull();
-        Assertions.assertThat(personalComputerShortDTO.getVersion()).isNotNull();
-        Assertions.assertThat(personalComputerShortDTO.getClient()).isEqualTo("test surname, test name");
-        Assertions.assertThat(personalComputerShortDTO.getPersonalComputer()).isEqualTo("test cpu, test gpu");
-        Assertions.assertThat(personalComputerShortDTO.getStatusId()).isEqualTo("order-status-open");
-        Assertions.assertThat(personalComputerShortDTO.getDateOfReceiving()).isEqualTo(dateOfReceiving);
+        Assertions.assertThat(internalOrderShortDTO).isNotNull();
+        Assertions.assertThat(internalOrderShortDTO.getId()).isNotNull();
+        Assertions.assertThat(internalOrderShortDTO.getVersion()).isNotNull();
+        Assertions.assertThat(internalOrderShortDTO.getClient()).isEqualTo("test surname, test name");
+        Assertions.assertThat(internalOrderShortDTO.getPersonalComputer()).isEqualTo("test cpu, test gpu");
+        Assertions.assertThat(internalOrderShortDTO.getStatus()).isEqualTo(InternalOrderShortDTO.Status.OPEN);
+        Assertions.assertThat(internalOrderShortDTO.getDateOfReceiving()).isEqualTo(dateOfReceiving);
     }
 }

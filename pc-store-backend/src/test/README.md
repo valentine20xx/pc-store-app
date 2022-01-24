@@ -6,4 +6,4 @@
 
 ### download
 
-`curl "http://localhost:8080/download/candidate-file/42764ce5-900e-4ba8-9235-6ca78607b199"`
+`curl "http://localhost:8080/download/internal-order-file/3fa49708-d0c6-4612-8f09-600d4412ee9c"`

@@ -5,7 +5,7 @@
 
 `ng serve -c=local` - start application for local environment.
 
-`ng serve -c=development` - start application for development environment.
+`ng serve -c=development --port 4201` - start application for development environment.
 
 `ng serve -c=local --host 0.0.0.0 --disable-host-check` - start application for local environment with external access.
 

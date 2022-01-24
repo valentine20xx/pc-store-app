@@ -1,5 +1,6 @@
 package de.niko.pcstore.repository;
 
+import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import java.util.List;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Repository;
 public interface InternalOrderRepository extends JpaRepository<InternalOrderEntity, String> {
     @Query("select ioe from InternalOrderEntity as ioe where ioe.dateOfDeletion is null")
     List<InternalOrderEntity> findAll();
+
+    @Query("select ioe from InternalOrderEntity as ioe where ioe.dateOfDeletion is null and ioe.status in :statuses")
+    List<InternalOrderEntity> findAllWithStatuses(List<InternalOrderEntity.Status> statuses);
 
     @Query("select ioe from InternalOrderEntity as ioe where ioe.dateOfDeletion is null and ioe.id = :id")
     Optional<InternalOrderEntity> findById(String id);

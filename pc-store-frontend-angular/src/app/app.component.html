@@ -26,6 +26,9 @@
         </ng-container>
 
         <div class="main-title" fxFlex="1 1 auto;">PC Store</div>
+        <ng-container *ngIf="loginState?.logged">
+          <div style="padding-right: 1em">{{loginState.name}}</div>
+        </ng-container>
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>more_vert</mat-icon>
         </button>
@@ -34,10 +37,18 @@
             <mat-icon>help_outline</mat-icon>
             <span>Hilfe</span>
           </button>
-          <button mat-menu-item>
-            <mat-icon>power_settings_new</mat-icon>
-            <span>Abmelden</span>
-          </button>
+          <ng-container *ngIf="loginState?.logged">
+            <button mat-menu-item (click)="logoutClick()">
+              <mat-icon>logout</mat-icon>
+              <span>Abmelden</span>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="!loginState?.logged">
+            <button mat-menu-item (click)="loginClick()">
+              <mat-icon>login</mat-icon>
+              <span>Anmelden</span>
+            </button>
+          </ng-container>
         </mat-menu>
       </mat-toolbar>
       <div class="main-section" fxFlex="grow">

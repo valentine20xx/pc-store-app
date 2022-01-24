@@ -1,25 +1,34 @@
 import {Injectable} from '@angular/core';
-import {delay, Observable, of, throwError} from "rxjs";
-import {IdValuePair, InternalOrderShortDTO} from "../model/model";
-import {generateId} from "../utils/utils";
+import {delay, Observable, of, throwError} from 'rxjs';
+import {InternalOrderShortDTO} from '../model/model';
+import {generateId} from '../utils/utils';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InternalOrdersService implements InternalOrders {
-  constructor() {
+  constructor(private httpClient: HttpClient) {
   }
 
   getInternalOrders(): Observable<InternalOrderShortDTO[]> {
     console.warn("Prod");
-    return of([]);
+    // return of([]);
+
+    return this.httpClient.get<InternalOrderShortDTO[]>('http://localhost:8080/internal-order-list')
   }
 
+  addInternalOrderMP(newInternalOrderMP: any, formData: FormData): Observable<any> {
+    console.debug(newInternalOrderMP);
 
+    return this.httpClient.post('http://localhost:8080/internal-order-multipart', formData);
+  }
 }
 
 export interface InternalOrders {
   getInternalOrders(): Observable<InternalOrderShortDTO[]>;
+
+  addInternalOrderMP(newInternalOrderMP: any, formData: FormData): Observable<any>;
 }
 
 export class InternalOrdersServiceLocal implements InternalOrders {
@@ -47,5 +56,11 @@ export class InternalOrdersServiceLocal implements InternalOrders {
 
       return throwError(() => new Error('Errror'));
     }
+  }
+
+  addInternalOrderMP(newInternalOrderMP: any, formData: FormData): Observable<any> {
+    console.debug(newInternalOrderMP);
+
+    return of();
   }
 }

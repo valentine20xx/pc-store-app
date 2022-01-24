@@ -2,6 +2,8 @@ package de.niko.pcstore.controller.api;
 
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
+import de.niko.pcstore.dto.NewInternalOrderFileDTO;
+import de.niko.pcstore.dto.NewInternalOrderMPDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.repository.InternalOrderRepository;
@@ -139,7 +141,7 @@ public class InternalOrderApiControllerTest {
         {
             String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_UPLOAD;
 
-            InternalOrderDTO.InternalOrderFileDTO internalOrderFileDTO = InternalOrderDTO.InternalOrderFileDTO.builder().name("IOF-1").note("bla-bla-bla").build();
+            NewInternalOrderFileDTO internalOrderFileDTO = NewInternalOrderFileDTO.builder().name("IOF-1").note("bla-bla-bla").build();
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -172,11 +174,11 @@ public class InternalOrderApiControllerTest {
         {
             String url = BASE_URI + InternalOrderApiController.ADD_INTERNAL_ORDER_MULTIPART;
 
-            InternalOrderDTO internalOrderDTO = InternalOrderDTO.builder().personalComputer(
-                    InternalOrderDTO.PersonalComputerDTO.builder().computerCase("PC-computerCase").build()
+            NewInternalOrderMPDTO internalOrderDTO = NewInternalOrderMPDTO.builder().personalComputer(
+                    NewInternalOrderMPDTO.NewPersonalComputerMPDTO.builder().computerCase("PC-computerCase").build()
             ).clientData(
-                    InternalOrderDTO.ClientDataDTO.builder().name("CD-name").surname("CD-surname").build()
-            ).internalOrderFiles(List.of(InternalOrderDTO.InternalOrderFileDTO.builder().id("UUID-FILE-1").name("test-file-pom.xml").build())).build();
+                    NewInternalOrderMPDTO.NewClientDataMPDTO.builder().name("CD-name").surname("CD-surname").build()
+            ).internalOrderFiles(List.of(NewInternalOrderMPDTO.NewInternalOrderFileMPDTO.builder().id("UUID-FILE-1").name("test-file-pom.xml").build())).build();
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);

@@ -82,7 +82,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Vorname</mat-label>
-              <input appAutoTrim matInput formControlName="name">
+              <input appAutoTrim matInput formControlName="name" autocomplete="on">
               <mat-error *ngIf="clientDataForm.controls.name.hasError('required')">
                 Vorname ist ein Pflichtfeld
               </mat-error>

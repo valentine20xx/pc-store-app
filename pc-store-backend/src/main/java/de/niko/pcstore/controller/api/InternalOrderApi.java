@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Api(tags = Tags.INTERNAL_ORDER_API_TAG)
 public interface InternalOrderApi {
     String GET_INTERNAL_ORDER_LIST = "/internal-order-list";
-
     String GET_INTERNAL_ORDER = "/internal-order/{id}";
     // TODO:
     String GET_INTERNAL_ORDER_CLIENT_DATA = "/internal-order/{id}/client-data";
@@ -48,7 +49,7 @@ public interface InternalOrderApi {
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<List<InternalOrderShortDTO>> getAllInternalOrderList();
+    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(@RequestParam(required = false) List<InternalOrderDTO.Status> statuses);
 
     @ApiOperation(value = "Get one specific internal order", response = InternalOrderDTO.class)
     @ApiResponses(value = {

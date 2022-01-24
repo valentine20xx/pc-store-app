@@ -20,6 +20,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {HttpClientModule} from '@angular/common/http';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 
@@ -33,7 +34,7 @@ import {ReferenceConverterPipe} from './utils/pipes/reference-converter.pipe';
 import {AddDocumentToNewInternalOrderComponent} from './internal-orders-overview/new-internal-order/add-document-to-new-internal-order/add-document-to-new-internal-order.component';
 import {ErrorDialogComponent} from './error-dialog/error-dialog.component';
 import {InternalOrderEffects} from './state/app.effects';
-import {appStateReducer, InternalOrdersState} from "./state/app.reducer";
+import {internalOrdersStateReducer, InternalOrdersState, loginStateReducer, LoginState} from "./state/app.reducer";
 import {environment} from '../environments/environment';
 import {Stages} from '../environments/model';
 import {InternalOrdersService, InternalOrdersServiceLocal} from './services/internal-orders.service';
@@ -52,6 +53,7 @@ import {InternalOrdersService, InternalOrdersServiceLocal} from './services/inte
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
@@ -72,7 +74,7 @@ import {InternalOrdersService, InternalOrdersServiceLocal} from './services/inte
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
-    StoreModule.forRoot<AppState>({internalOrdersState: appStateReducer}),
+    StoreModule.forRoot<AppState>({internalOrdersState: internalOrdersStateReducer, loginState: loginStateReducer}),
     EffectsModule.forRoot([InternalOrderEffects]),
     StoreDevtoolsModule.instrument({
       maxAge: 25, // Retains last 25 states
@@ -90,5 +92,6 @@ export class AppModule {
 }
 
 export interface AppState {
-  internalOrdersState: InternalOrdersState
+  internalOrdersState: InternalOrdersState,
+  loginState: LoginState
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
+import de.niko.pcstore.dto.NewInternalOrderMPDTO;
 import de.niko.pcstore.entity.ClientDataEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
@@ -41,6 +42,7 @@ public class MapperConfiguration {
 
         modelMapper.addMappings(new ConvertPersonalComputerEntity2PersonalComputerDTO());
         modelMapper.addMappings(new ConvertPersonalComputerDTO2PersonalComputerEntity());
+        modelMapper.addMappings(new ConvertPersonalComputerMPDTO2PersonalComputerEntity());
 
         modelMapper.addConverter(new ConvertInternalOrderEntity2InternalOrderShortDTO());
 
@@ -67,6 +69,19 @@ public class MapperConfiguration {
                 List<InternalOrderDTO.InternalOrderFileDTO> source = context.getSource();
 
                 return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).version(personalComputerFileDTO.getVersion()).name(personalComputerFileDTO.getName()).note(personalComputerFileDTO.getNote()).build()).collect(Collectors.toSet());
+            };
+
+            using(converter).map(source.getInternalOrderFiles(), destination.getInternalOrderFileMetadataEntities());
+        }
+    }
+
+    static class ConvertPersonalComputerMPDTO2PersonalComputerEntity extends PropertyMap<NewInternalOrderMPDTO, InternalOrderEntity> {
+        @Override
+        protected void configure() {
+            Converter<List<NewInternalOrderMPDTO.NewInternalOrderFileMPDTO>, Set<InternalOrderFileMetadataEntity>> converter = context -> {
+                List<NewInternalOrderMPDTO.NewInternalOrderFileMPDTO> source = context.getSource();
+
+                return CollectionUtils.isEmpty(source) ? Collections.emptySet() : source.stream().map(personalComputerFileDTO -> InternalOrderFileMetadataEntity.builder().id(personalComputerFileDTO.getId()).name(personalComputerFileDTO.getName()).note(personalComputerFileDTO.getNote()).build()).collect(Collectors.toSet());
             };
 
             using(converter).map(source.getInternalOrderFiles(), destination.getInternalOrderFileMetadataEntities());

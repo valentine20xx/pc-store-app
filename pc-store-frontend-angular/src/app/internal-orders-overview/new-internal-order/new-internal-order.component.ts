@@ -1,11 +1,11 @@
 import {Component, Inject, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {FormBuilder} from "@angular/forms";
+import {FormBuilder, Validators} from "@angular/forms";
 import {MatStepper} from "@angular/material/stepper";
 import {AddDocumentOutput, AddDocumentToNewInternalOrderComponent, Buttons} from "./add-document-to-new-internal-order/add-document-to-new-internal-order.component";
 import {generateId} from "../../utils/utils";
 import {MatTableDataSource} from "@angular/material/table";
-import {getSalutations, InternalOrderShortDTO} from "../../model/model";
+import {getSalutations, NewInternalOrderMPDTO} from "../../model/model";
 
 @Component({
   selector: 'app-new-internal-order',
@@ -22,12 +22,8 @@ export class NewInternalOrderComponent {
     motherboard: [''
       // , [Validators.required]
     ],
-    processor: [''
-      // , [Validators.required]
-    ],
-    graphicsCard: [''
-      // , [Validators.required]
-    ],
+    processor: ['', [Validators.required]],
+    graphicsCard: ['', [Validators.required]],
     randomAccessMemory: [''
       // , [Validators.required]
     ],
@@ -40,15 +36,9 @@ export class NewInternalOrderComponent {
   });
 
   clientDataForm = this.formBuilder.group({
-    salutation: [''
-      // , [Validators.required]
-    ],
-    name: [''
-      //, [Validators.required, Validators.pattern('^[A-Za-zÖÄÜöäüß\ \-]*$')]
-    ],
-    surname: [''
-      //, [Validators.required, Validators.pattern('^[A-Za-zÖÄÜöäüß\ \-]*$')]
-    ],
+    salutation: ['', [Validators.required]],
+    name: ['', [Validators.required, Validators.pattern('^[A-Za-zÖÄÜöäüß\ \-]*$')]],
+    surname: ['', [Validators.required, Validators.pattern('^[A-Za-zÖÄÜöäüß\ \-]*$')]],
     street: [''
       // , [Validators.required, Validators.pattern('^[A-Za-zÖÄÜöäüß\ \-.&]*$')]
     ],
@@ -79,7 +69,7 @@ export class NewInternalOrderComponent {
 
   constructor(private formBuilder: FormBuilder,
               private dialog: MatDialog,
-              private dialogRef: MatDialogRef<any, InternalOrderShortDTO>,
+              private dialogRef: MatDialogRef<NewInternalOrderComponent, NewInternalOrderOutput>,
               @Inject(MAT_DIALOG_DATA) public input: any) {
 
     this.documentsDataSource.data = [];
@@ -95,12 +85,26 @@ export class NewInternalOrderComponent {
 
   newInternalOrderCreate(): void {
     this.dialogRef.close({
-      id: generateId(),
-      version: new Date(),
-      client: `${this.clientDataForm.controls['surname'].value}, ${this.clientDataForm.controls['name'].value}`,
-      personalComputer: `${this.personalComputerForm.controls['processor'].value}, ${this.personalComputerForm.controls['graphicsCard'].value}`,
-      status: 'open',
-      dateOfReceiving: new Date()
+      documents: this.documentsDataSource.data,
+      newInternalOrder: {
+        clientData: {
+          salutation: this.clientDataForm.controls['salutation'].value,
+          name: this.clientDataForm.controls['name'].value,
+          surname: this.clientDataForm.controls['surname'].value
+        },
+        personalComputer: {
+          processor: this.personalComputerForm.controls['processor'].value,
+          graphicsCard: this.personalComputerForm.controls['graphicsCard'].value
+        },
+        privacyPolicy: true,
+        files: this.documentsDataSource.data.map(value => {
+          return {
+            id: value.id || '',
+            name: value.name || '',
+            note: value.note || ''
+          }
+        })
+      }
     });
   }
 
@@ -133,4 +137,9 @@ export interface Document {
   name?: string;
   note?: string;
   file?: File;
+}
+
+export interface NewInternalOrderOutput {
+  documents: Document[];
+  newInternalOrder: NewInternalOrderMPDTO;
 }

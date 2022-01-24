@@ -1,3 +1,4 @@
-import {AppState} from "../app.module";
+import {AppState} from '../app.module';
 
-export const selectFeature = (state: AppState) => state.internalOrdersState;
+export const internalOrdersStateFeature = (state: AppState) => state.internalOrdersState;
+export const loginStateFeature = (state: AppState) => state.loginState;

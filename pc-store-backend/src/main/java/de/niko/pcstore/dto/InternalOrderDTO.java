@@ -83,15 +83,15 @@ public class InternalOrderDTO extends DefaultDTOObject {
     @SuperBuilder
     public static class ClientDataDTO extends DefaultDTOObject {
         @JsonProperty
-        @ApiModelProperty(example = "male", value = "Gender of the candidate", required = true)
+        @ApiModelProperty(example = "male", value = "Gender of the customer", required = true)
         private Salutation salutation;
 
         @JsonProperty
-        @ApiModelProperty(example = "John", value = "Name of the candidate", required = true)
+        @ApiModelProperty(example = "John", value = "Name of the customer", required = true)
         private String name;
 
         @JsonProperty
-        @ApiModelProperty(example = "Smith", value = "Surname of the candidate", required = true)
+        @ApiModelProperty(example = "Smith", value = "Surname of the customer", required = true)
         private String surname;
 
         @JsonProperty
@@ -111,15 +111,15 @@ public class InternalOrderDTO extends DefaultDTOObject {
         private String city;
 
         @JsonProperty
-        @ApiModelProperty(example = "+49528252826", value = "Telephone of the candidate for communication")
+        @ApiModelProperty(example = "+49528252826", value = "Telephone of the customer for communication")
         private String telephone;
 
         @JsonProperty
-        @ApiModelProperty(example = "+49528252826", value = "Mobile phone of the candidate for communication")
+        @ApiModelProperty(example = "+49528252826", value = "Mobile phone of the customer for communication")
         private String cellphone;
 
         @JsonProperty
-        @ApiModelProperty(example = "example@test.de", value = "Email of the candidate for communication")
+        @ApiModelProperty(example = "example@test.de", value = "Email of the customer for communication")
         private String email;
 
         public enum Salutation {

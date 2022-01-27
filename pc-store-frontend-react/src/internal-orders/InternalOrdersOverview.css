@@ -1,0 +1,7 @@
+.internal-orders-overview {
+    padding: 1em;
+    display: flex;
+    flex: 1 1 100%;
+    flex-direction: column;
+    gap: 1em;
+}

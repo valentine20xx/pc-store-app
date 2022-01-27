@@ -47,19 +47,7 @@ body {
 }
 
 .main-section {
-  padding: 0.5em;
-
-  .section {
-    margin: 0.5em;
-
-    .ui-button {
-      margin-right: 0.5em;
-    }
-  }
-
-  .section:not(:first-child) {
-    padding-top: 0.5em;
-  }
+  padding: 1em;
 }
 
 .footer-section {
@@ -68,20 +56,12 @@ body {
   background-color: $blue-color
 }
 
-.final-section-item {
-  margin-bottom: 1em;
-
-  .final-section-title {
-    font-size: x-large;
-  }
-
-  .final-section-sub-item {
-    padding-left: 2em;
-  }
+.final-section-title {
+  font-size: x-large;
 }
 
-.mat-table {
-  width: 100%;
+.final-section-sub-item {
+  padding-left: 2em;
 }
 
 .stepper-section {
@@ -94,8 +74,3 @@ body {
   font-weight: bold;
   font-size: 1.5em
 }
-
-//app-wellcome-page {
-//  display: flex;
-//  place-content: center center;
-//}

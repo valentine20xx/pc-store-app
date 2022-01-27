@@ -49,7 +49,7 @@ public interface InternalOrderApi {
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(@RequestParam(required = false) List<InternalOrderDTO.Status> statuses);
+    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(@RequestParam(required = false) @ApiParam(value = "Statuses of the internal order") List<InternalOrderDTO.Status> statuses);
 
     @ApiOperation(value = "Get one specific internal order", response = InternalOrderDTO.class)
     @ApiResponses(value = {

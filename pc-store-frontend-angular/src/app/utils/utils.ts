@@ -1,5 +1,4 @@
-export function generateId() {
-  // return 'xxxxxxxx'.replace(/[xy]/g, (c) => {
+export function generateId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     // tslint:disable-next-line:no-bitwise
     const r = Math.random() * 16 | 0;

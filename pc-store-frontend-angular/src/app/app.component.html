@@ -7,8 +7,8 @@
     </mat-nav-list>
   </mat-sidenav>
 
-  <mat-sidenav-content>
-    <div style="min-height: 100vh;" fxLayout="column">
+  <mat-sidenav-content fxFill fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxFill fxLayout="column">
       <mat-toolbar color="primary" fxLayout="row">
         <ng-container *ngIf="mainSidenav.opened == false">
           <button mat-icon-button (click)="mainSidenav.open()" matTooltip="Open menu"
@@ -55,9 +55,9 @@
         <router-outlet></router-outlet>
       </div>
 
-      <div class="footer-section" fxLayout="row-reverse" fxFlexAlign="end center">
+      <div class="footer-section" fxLayout="row" fxLayoutAlign="end stretch">
         <ng-container *ngIf="!isProduction">
-          <div fxLayout="column" fxFlexAlign="center">
+          <div fxLayout="column" fxLayoutAlign="center stretch">
             Stage = {{ environment.stage }}
           </div>
         </ng-container>

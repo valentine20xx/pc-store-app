@@ -1,10 +1,17 @@
 # PC Store (React Frontend)
 
 Links:
-- Material UI https://mui.com/
+- Material UI: https://mui.com/
+- Icons: https://fontawesome.com/v6.0/icons
+
+Commands:
 - npm outdated - get all outdated dependencies
 - npm update - update
 - npx npm-check-updates -u
+- Prod:
+  - npm install -g serve
+  - serve -s build
+
 
 # Getting Started with Create React App
 

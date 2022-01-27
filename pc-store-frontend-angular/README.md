@@ -32,5 +32,6 @@ ng test pc-store-frontend-angular --source-map
 - [ ] UI Unit Tests
 - [ ] Refactor and upgrade fixing
 - [x] Loader
-- [ ] Error handler
+- [x] Error handler
+- [ ] Replace styles through flex
 

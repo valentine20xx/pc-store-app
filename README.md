@@ -6,7 +6,6 @@ Architecture:
 
 ![Architecture](documentation\architecture.svg)
 
-
 ## PC Store Backend
 
 [Backend](pc-store-backend/README.md)

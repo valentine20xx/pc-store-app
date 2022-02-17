@@ -1,0 +1,49 @@
+<div fxLayout="row" fxLayoutAlign="space-between start">
+  <h2 mat-dialog-title>Internal order overview</h2>
+  <button mat-mini-fab color="primary" mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content>
+  <div fxLayout="column" fxLayoutGap="1em">
+    <div>
+      <div class="final-section-title">Personal computer specifications:</div>
+      <div class="final-section-sub-item">Computer case: {{ internalOrderDTO.personalComputer.computerCase }}</div>
+      <div class="final-section-sub-item">Motherboard: {{ internalOrderDTO.personalComputer.motherboard }}</div>
+      <div class="final-section-sub-item">Processor: {{ internalOrderDTO.personalComputer.processor }}</div>
+      <div class="final-section-sub-item">Graphics card: {{ internalOrderDTO.personalComputer.graphicsCard }}</div>
+      <div class="final-section-sub-item">Random access memory: {{ internalOrderDTO.personalComputer.randomAccessMemory }}</div>
+      <div class="final-section-sub-item">Storage device: {{ internalOrderDTO.personalComputer.storageDevice }}</div>
+      <div class="final-section-sub-item">Power supply unit: {{ internalOrderDTO.personalComputer.powerSupplyUnit }}</div>
+    </div>
+    <div>
+      <div class="final-section-title">Client data:</div>
+      <div class="final-section-sub-item">Salutation: {{  internalOrderDTO.clientData.salutation | referenceConverter:salutations }}</div>
+      <div class="final-section-sub-item">Name: {{ internalOrderDTO.clientData.name }}</div>
+      <div class="final-section-sub-item">Surname: {{ internalOrderDTO.clientData.surname }}</div>
+      <div class="final-section-sub-item">Street: {{ internalOrderDTO.clientData.street }}</div>
+      <div class="final-section-sub-item">House number: {{ internalOrderDTO.clientData.houseNumber }}</div>
+      <div class="final-section-sub-item">Zip: {{ internalOrderDTO.clientData.zip }}</div>
+      <div class="final-section-sub-item">City: {{ internalOrderDTO.clientData.city }}</div>
+      <div class="final-section-sub-item">Telephone: {{ internalOrderDTO.clientData.telephone }}</div>
+      <div class="final-section-sub-item">Cellphone: {{ internalOrderDTO.clientData.cellphone }}</div>
+      <div class="final-section-sub-item">eMail: {{ internalOrderDTO.clientData.email }}</div>
+    </div>
+    <div>
+      <ng-container *ngIf="internalOrderDTO.internalOrderFiles.length > 0">
+        <div class="final-section-title">Additional files:</div>
+        <div *ngFor="let internalOrderFile of internalOrderDTO.internalOrderFiles">
+          <div class="final-section-sub-item">Document:
+            <app-long-text-short [text]="internalOrderFile.name" showAllButton="false" url="http://localhost:8080/download/internal-order-file/{{internalOrderFile.id}}"></app-long-text-short>
+            <ng-container *ngIf="isNotEmpty(internalOrderFile.note)">, Note:
+              <app-long-text-short [text]="internalOrderFile.note" showAllButton="true"></app-long-text-short>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <!--  <button mat-raised-button (click)="resetClick()">Reset</button>-->
+</mat-dialog-actions>

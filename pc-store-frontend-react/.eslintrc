@@ -1,0 +1,42 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    //    "quotes": "error",
+    //    "no-var": "error",
+    //    "no-debugger": "error",
+    //    "no-console": "error"
+  }
+}
+/*
+{
+    "extends": ["airbnb","prettier"],
+    "plugins": ["jest","prettier"],
+    "env": {
+    "jest": true,
+    "browser": true
+    },
+    "rules": {
+      "no-trailing-spaces": [2, { "skipBlankLines": true }],
+      "react/jsx-indent": [2, 2],
+      "react/jsx-indent-props": [2, 2],
+      "func-names": 0,
+      "react/jsx-boolean-value": 0,
+      "dot-notation": [ 0, { "allowKeywords": true, "allowPattern": "" } ],
+      "react/no-direct-mutation-state": 2,
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "jsx-a11y/href-no-hash": "off",
+      "jsx-a11y/anchor-is-valid": ["warn", { "aspects": ["invalidHref"] }]
+    }
+}
+
+
+*/

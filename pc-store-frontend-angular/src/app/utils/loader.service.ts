@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {MatSpinner} from "@angular/material/progress-spinner";
+import {MatSpinner} from '@angular/material/progress-spinner';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,15 @@ export class LoaderService {
       hasBackdrop: true,
       positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically()
     });
+  }
+
+  setSpinnerVisibility(value: boolean) {
+    if (value == this.isActive) {
+      value ? console.warn('Loader was already showed') : console.warn('Loader was already hidden');
+    } else {
+      value ? this.showSpinner() : this.hideSpinner();
+      this.isActive = value;
+    }
   }
 
   showSpinner() {

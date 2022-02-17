@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {delay, Observable, of, throwError} from 'rxjs';
-import {InternalOrderShortDTO} from '../model/model';
+import {InternalOrderDTO, InternalOrderShortDTO, NewInternalOrderMPDTO} from '../model/model';
 import {generateId} from '../utils/utils';
 import {HttpClient} from '@angular/common/http';
 
@@ -12,21 +12,22 @@ export class InternalOrdersService implements InternalOrders {
   }
 
   getInternalOrders(): Observable<InternalOrderShortDTO[]> {
-    console.warn("Prod");
-    // return of([]);
-
     return this.httpClient.get<InternalOrderShortDTO[]>('http://localhost:8080/internal-order-list')
   }
 
-  addInternalOrderMP(newInternalOrderMP: any, formData: FormData): Observable<any> {
-    console.debug(newInternalOrderMP);
+  addInternalOrderMP(newInternalOrderMP: NewInternalOrderMPDTO, formData: FormData): Observable<InternalOrderDTO> {
+    return this.httpClient.post<InternalOrderDTO>('http://localhost:8080/internal-order-multipart', formData);
+  }
 
-    return this.httpClient.post('http://localhost:8080/internal-order-multipart', formData);
+  getInternalOrder(id: string): Observable<InternalOrderDTO> {
+    return this.httpClient.get<InternalOrderDTO>(`http://localhost:8080/internal-order/${id}`);
   }
 }
 
 export interface InternalOrders {
   getInternalOrders(): Observable<InternalOrderShortDTO[]>;
+
+  getInternalOrder(id: string): Observable<InternalOrderDTO>;
 
   addInternalOrderMP(newInternalOrderMP: any, formData: FormData): Observable<any>;
 }
@@ -38,7 +39,7 @@ export class InternalOrdersServiceLocal implements InternalOrders {
   }
 
   getInternalOrders(): Observable<InternalOrderShortDTO[]> {
-    console.warn("Local");
+    console.warn('Local');
 
     if (this.counter > 1) {
       this.counter = 1;
@@ -62,5 +63,38 @@ export class InternalOrdersServiceLocal implements InternalOrders {
     console.debug(newInternalOrderMP);
 
     return of();
+  }
+
+  getInternalOrder(id: string): Observable<InternalOrderDTO> {
+    return of<InternalOrderDTO>({
+      id: generateId(),
+      version: new Date(),
+      personalComputer: {
+        id: generateId(),
+        version: new Date(),
+        graphicsCard: 'graphicsCard',
+        processor: 'processor',
+        computerCase: 'computerCase',
+        motherboard: 'motherboard',
+        powerSupplyUnit: 'powerSupplyUnit',
+        randomAccessMemory: 'randomAccessMemory',
+        storageDevice: 'storageDevice'
+      },
+      clientData: {
+        id: generateId(),
+        version: new Date(),
+        salutation: 'male',
+        name: 'name',
+        surname: 'surname',
+        zip: '',
+        city: '',
+        email: '',
+        houseNumber: '',
+        street: '',
+        cellphone: '',
+        telephone: ''
+      },
+      internalOrderFiles: []
+    });
   }
 }

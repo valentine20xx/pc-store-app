@@ -7,3 +7,11 @@ export function generateId(): string {
     return v.toString(16);
   });
 }
+
+export function isEmpty(str: string): boolean {
+  return str == null || str.trim() == '';
+}
+
+export function isNotEmpty(str: string): boolean {
+  return !isEmpty(str)
+}

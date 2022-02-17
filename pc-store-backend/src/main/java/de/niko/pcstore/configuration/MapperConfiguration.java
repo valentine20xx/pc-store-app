@@ -52,13 +52,20 @@ public class MapperConfiguration {
     static class ConvertPersonalComputerEntity2PersonalComputerDTO extends PropertyMap<InternalOrderEntity, InternalOrderDTO> {
         @Override
         protected void configure() {
-            Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderDTO.InternalOrderFileDTO>> converter = context -> {
+            Converter<Set<InternalOrderFileMetadataEntity>, List<InternalOrderDTO.InternalOrderFileDTO>> converter1 = context -> {
                 Set<InternalOrderFileMetadataEntity> source = context.getSource();
 
                 return CollectionUtils.isEmpty(source) ? Collections.emptyList() : source.stream().map(personalComputerFileMetadataEntity -> InternalOrderDTO.InternalOrderFileDTO.builder().id(personalComputerFileMetadataEntity.getId()).version(personalComputerFileMetadataEntity.getVersion()).name(personalComputerFileMetadataEntity.getName()).note(personalComputerFileMetadataEntity.getNote()).build()).collect(Collectors.toList());
             };
 
-            using(converter).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
+            Converter<String, InternalOrderDTO.ClientDataDTO.Salutation> converter2 = context -> {
+                String source = context.getSource();
+
+                return  InternalOrderDTO.ClientDataDTO.Salutation.fromString(source);
+            };
+
+            using(converter1).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
+            using(converter2).map(source.getClientData().getSalutation(), destination.getClientData().getSalutation());
         }
     }
 

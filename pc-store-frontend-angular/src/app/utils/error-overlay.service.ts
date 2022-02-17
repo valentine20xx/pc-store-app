@@ -20,7 +20,7 @@ export class ErrorOverlayService {
     });
   }
 
-  showErrorOverlay(message: string, fx?: () => void, cancelable: boolean = false): void {
+  showErrorOverlay(message: string, callback?: () => void, cancelable: boolean = false): void {
     if (this.isActive) {
       console.warn('ErrorOverlay was already showed');
     } else {
@@ -33,8 +33,8 @@ export class ErrorOverlayService {
         }
       }).afterClosed().subscribe(value => {
         this.hideErrorOverlay();
-        if (value === ErrorDialogCloseButton.RETRY && fx) {
-          fx();
+        if (value === ErrorDialogCloseButton.RETRY && callback) {
+          callback();
         }
       });
 

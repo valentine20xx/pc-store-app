@@ -1,9 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import {BrowserRouter, Routes, Route} from "react-router-dom";
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import App from "./App";
 import InternalOrdersOverview from "./internal-orders/InternalOrdersOverview";
 
 ReactDOM.render(
@@ -17,7 +17,7 @@ ReactDOM.render(
                 <Route
                     path="/"
                     element={
-                        <div style={{display: 'flex', flexDirection: 'row', flex: '1 1 100%', placeContent: 'center', alignItems: 'center'}}>
+                        <div style={{display: "flex", flexDirection: "row", flex: "1 1 100%", placeContent: "center", alignItems: "center"}}>
                             <div>
                                 <h1>Herzlich willkommen !</h1>
                             </div>
@@ -27,7 +27,7 @@ ReactDOM.render(
             </Route>
         </Routes>
     </BrowserRouter>,
-    document.getElementById('root')
+    document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

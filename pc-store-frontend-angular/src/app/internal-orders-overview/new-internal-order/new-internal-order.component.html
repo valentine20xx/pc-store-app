@@ -214,12 +214,14 @@
           <div class="final-section-sub-item">eMail: {{ clientDataForm.controls.email.value }}</div>
         </div>
         <div>
-          <div class="final-section-title">Additional files:</div>
-          <div *ngFor="let document of this.documentsDataSource.data">
-            <div class="final-section-sub-item">Document: {{ document.name }}
-              <ng-container *ngIf="document.note != null">, Note: {{ document.note }}</ng-container>
+          <ng-container *ngIf="this.documentsDataSource.data.length > 0">
+            <div class="final-section-title">Additional files:</div>
+            <div *ngFor="let document of this.documentsDataSource.data">
+              <div class="final-section-sub-item">Document: {{ document.name }}
+                <ng-container *ngIf="document.note != null">, Note: {{ document.note }}</ng-container>
+              </div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </mat-step>

@@ -1,21 +1,22 @@
-import React from 'react';
-import './App.css';
-import {AppBar, Drawer, IconButton, List, Toolbar, Typography, ListItem, ListItemButton, ListItemText} from "@mui/material";
-import Menu from "@mui/icons-material/Menu";
+import React from "react";
+import "./App.css";
+import {AppBar, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography, useTheme} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import {Outlet, useNavigate} from "react-router-dom";
 
 const App = () => {
     const [state, setState] = React.useState({
         menu: false
     });
+    const theme = useTheme();
 
     const navigate = useNavigate();
 
-    const openMenu = (event: any): void => {
+    const openMenu = (): void => {
         setState({...state, menu: true});
     }
 
-    const closeMenu = (event: any, reason: "backdropClick" | "escapeKeyDown"): void => {
+    const closeMenu = (): void => {
         setState({...state, menu: false});
     }
 
@@ -25,36 +26,41 @@ const App = () => {
     }
 
     return (
-        <div style={{display: "flex", flexDirection: "column", flexGrow: '1'}}>
+        <div style={{display: "flex", flexDirection: "column", flexGrow: "1"}}>
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
-                        sx={{mr: 2}}
-                        onClick={openMenu}
-                    >
-                        <Menu/>
+                        onClick={openMenu}>
+                        <MenuIcon/>
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{flexGrow: 1, textAlign: 'center'}}>
+                    <Typography variant="h6" component="div" sx={{flexGrow: 1, textAlign: "center"}}>
                         PC Store
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <div style={{display: 'flex', flex: '1 1 100%'}}>
+            <div style={{display: "flex", flex: "1 1 100%"}}>
                 <Outlet/>
             </div>
             <NavigationMenu state={state} closeMenu={closeMenu} internalOrdersClick={internalOrdersClick}/>
+            <div style={{
+                backgroundColor: theme.palette.primary.main,
+                padding: "0.5em", height: "3em",
+                display: "flex", flexDirection: "row", justifyContent: "end", alignItems: "center"
+            }}>
+                <div style={{color: theme.palette.common.white}}>
+                    Footer
+                </div>
+            </div>
         </div>
     );
 }
-// TODO: fix ignore
-// @ts-ignore
-const NavigationMenu = ({state, closeMenu, internalOrdersClick}) => {
 
+const NavigationMenu: React.FC<{ state: { menu: boolean }, closeMenu: () => void, internalOrdersClick: () => void }> = ({state, closeMenu, internalOrdersClick}) => {
     return (
-        <Drawer anchor={'left'}
+        <Drawer anchor={"left"}
                 open={state.menu}
                 onClose={closeMenu}>
             <div style={{width: "15em"}}>

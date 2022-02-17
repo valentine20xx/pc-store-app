@@ -8,17 +8,35 @@ export interface InternalOrderShortDTO extends DefaultDTOObject {
 export interface InternalOrderDTO extends DefaultDTOObject {
   clientData: ClientDataDTO;
   personalComputer: PersonalComputerDTO;
+  internalOrderFiles: Array<InternalOrderFileDTO>
+}
+
+export interface InternalOrderFileDTO extends DefaultDTOObject {
+  name: string;
+  note: string;
 }
 
 export interface ClientDataDTO extends DefaultDTOObject {
-  salutationId: string;
+  salutation: 'male' | 'female';
   name: string;
   surname: string;
+  street: string;
+  houseNumber: string;
+  zip: string;
+  city: string;
+  telephone: string;
+  cellphone: string;
+  email: string;
 }
 
 export interface PersonalComputerDTO extends DefaultDTOObject {
+  computerCase: string;
+  motherboard: string;
   processor: string;
   graphicsCard: string;
+  randomAccessMemory: string;
+  storageDevice: string;
+  powerSupplyUnit: string;
 }
 
 
@@ -37,10 +55,22 @@ export interface NewInternalOrderMPDTO {
     salutation: 'male' | 'female';
     name: string;
     surname: string;
+    street: string;
+    houseNumber: string;
+    zip: string;
+    city: string;
+    telephone: string;
+    cellphone: string;
+    email: string;
   };
   personalComputer: {
+    computerCase: string;
+    motherboard: string;
     processor: string;
     graphicsCard: string;
+    randomAccessMemory: string;
+    storageDevice: string;
+    powerSupplyUnit: string;
   };
   privacyPolicy: boolean;
   files: Array<{

@@ -1,18 +1,20 @@
+import {DataSource} from '@angular/cdk/collections';
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
+import {select, Store} from '@ngrx/store';
+import {Observable, Subscription} from 'rxjs';
+import {AppState} from '../app.module';
+import {getInternalOrderStatuses, InternalOrderDTO, InternalOrderShortDTO} from '../model/model';
+import {InternalOrdersService} from '../services/internal-orders.service';
+import {loadInternalOrder, loadInternalOrders} from '../state/app.actions';
+import {internalOrdersStateFeature, internalOrderStateFeature} from '../state/app.selectors';
+import {ErrorOverlayService} from '../utils/error-overlay.service';
+import {LoaderService} from '../utils/loader.service';
+import {InternalOrderOverviewComponent} from './internal-order-overview/internal-order-overview.component';
 import {NewInternalOrderComponent, NewInternalOrderOutput} from './new-internal-order/new-internal-order.component';
-import {getInternalOrderStatuses, InternalOrderShortDTO, NewInternalOrderMPDTO} from "../model/model";
-import {select, Store} from "@ngrx/store";
-import {skip, Subscription} from "rxjs";
-import {MatTableDataSource} from "@angular/material/table";
-import {LoaderService} from "../utils/loader.service";
-import {ErrorOverlayService} from "../utils/error-overlay.service";
-import {MatPaginator} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
-import {AppState} from "../app.module";
-import {loadInternalOrders} from "../state/app.actions";
-import {loginStateFeature, internalOrdersStateFeature} from "../state/app.selectors";
-import {InternalOrdersService} from "../services/internal-orders.service";
 
 
 @Component({
@@ -27,7 +29,8 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  one?: Subscription;
+  subscriptions: Array<Subscription> = [];
+
   statuses = getInternalOrderStatuses();
 
   constructor(private store: Store<AppState>,
@@ -38,14 +41,46 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
   }
 
   ngOnInit(): void {
-    this.one = this.store.pipe(select(internalOrdersStateFeature), skip(1)).subscribe(value => {
-        this.internalOrderShortDataSource.data = value.internalOrders;
-        value.loading ? this.loaderService.showSpinner() : this.loaderService.hideSpinner();
-        return value.hasError ? this.errorOverlayService.showErrorOverlay('Unable to load internal orders', () => {
-          this.store.dispatch(loadInternalOrders());
-        }) : null;
-      }
-    );
+    this.subscriptions.push(
+      this.store.pipe(select(internalOrdersStateFeature)).subscribe(value => {
+          switch (value.status) {
+            case 'SEND':
+              this.loaderService.showSpinner();
+              this.internalOrderShortDataSource.data = [];
+              break;
+            case 'RECEIVED':
+              this.loaderService.hideSpinner();
+              this.internalOrderShortDataSource.data = value.internalOrders;
+              break;
+            case 'FAILURE':
+              this.loaderService.hideSpinner();
+              this.internalOrderShortDataSource.data = [];
+              this.errorOverlayService.showErrorOverlay('Unable to load internal orders', () => {
+                this.store.dispatch(loadInternalOrders());
+              });
+              break;
+          }
+        }
+      ),
+      this.store.pipe(select(internalOrderStateFeature)).subscribe(value => {
+        switch (value.status) {
+          case 'SEND':
+            this.loaderService.showSpinner();
+            break;
+          case 'RECEIVED':
+            this.loaderService.hideSpinner();
+            this.dialog.open<InternalOrderOverviewComponent, InternalOrderDTO, any>(InternalOrderOverviewComponent, {
+              width: '50em',
+              data: value.internalOrder,
+              disableClose: true
+            })
+            break;
+          case 'FAILURE':
+            this.loaderService.hideSpinner();
+            break;
+        }
+      })
+    )
 
     this.store.dispatch(loadInternalOrders());
   }
@@ -70,8 +105,9 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
         formDate.set('internal-order', JSON.stringify(result.newInternalOrder));
 
         result.documents.forEach(value => {
-          if (value.file != null && value.id != null)
+          if (value.file != null && value.id != null) {
             formDate.append(value.id, value.file);
+          }
         })
 
         this.internalOrdersService.addInternalOrderMP(result.newInternalOrder, formDate).subscribe(value => {
@@ -83,7 +119,11 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
     });
   }
 
+  internalOrderOverviewClick(id: string): void {
+    this.store.dispatch(loadInternalOrder({id}));
+  }
+
   ngOnDestroy(): void {
-    this.one?.unsubscribe();
+    this.subscriptions.forEach(value => value.unsubscribe());
   }
 }

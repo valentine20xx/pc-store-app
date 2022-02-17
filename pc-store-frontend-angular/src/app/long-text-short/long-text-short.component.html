@@ -1,0 +1,17 @@
+<ng-container *ngIf="!full">
+  <ng-container *ngIf="text.length <= factor">
+    <ng-container *ngIf="url == null">{{text}}</ng-container>
+    <ng-container *ngIf="url != null"><a href="{{url}}" class="document-link">{{text}}</a></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="text.length > factor">
+    <ng-container *ngIf="url == null">{{text | slice: 0:factor - 3}}</ng-container>
+    <ng-container *ngIf="url != null"><a href="{{url}}" class="document-link">{{text | slice: 0:factor - 3}}</a></ng-container>
+    <ng-container *ngIf="showAllButton">&hellip;<span class="show-all" (click)="showAll()">[Show all]</span></ng-container>
+  </ng-container>
+</ng-container>
+
+<ng-container *ngIf="full">
+  <ng-container *ngIf="url == null">{{text}}</ng-container>
+  <ng-container *ngIf="url != null"><a href="{{url}}" class="document-link">{{text}}</a></ng-container>
+</ng-container>

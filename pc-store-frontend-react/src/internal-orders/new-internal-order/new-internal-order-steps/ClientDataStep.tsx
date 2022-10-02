@@ -20,7 +20,7 @@ const ClientDataStep = ({newInternalOrder, setNewInternalOrder, tab2Validation, 
                             }
                         }}
                 >
-                    <MenuItem value=" ">(<i>Please select ...</i>)</MenuItem>
+                    <MenuItem value="unset">(<i>Please select ...</i>)</MenuItem>
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
                 </Select>
@@ -33,7 +33,14 @@ const ClientDataStep = ({newInternalOrder, setNewInternalOrder, tab2Validation, 
                            setNewInternalOrder({...newInternalOrder});
                        }}
             />
-            <TextField key="surname" defaultValue={newInternalOrder.clientData.surname} label="Surname" variant="outlined"/>
+            <TextField key="surname" label="Surname" variant="outlined"
+                       defaultValue={newInternalOrder.clientData.surname}
+                       error={!tab2Validation.surname.valid}
+                       onChange={event => {
+                           newInternalOrder.clientData.surname = event.target.value;
+                           setNewInternalOrder({...newInternalOrder});
+                       }}
+            />
             <TextField defaultValue={""} label="Street" variant="outlined"/>
             <TextField defaultValue={""} label="House number" variant="outlined"/>
         </div>

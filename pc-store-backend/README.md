@@ -64,6 +64,7 @@ maven command: `mvn clean package -Pprod`
 - [x] Add client data
 - [x] Database initialization for tests
 - [ ] Split ApiControllers into service and controller 
+- [ ] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
 
 ### Others
 

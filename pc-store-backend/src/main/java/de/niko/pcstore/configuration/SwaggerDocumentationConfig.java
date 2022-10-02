@@ -1,72 +1,45 @@
 package de.niko.pcstore.configuration;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.Tag;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.DocExpansion;
-import springfox.documentation.swagger.web.ModelRendering;
-import springfox.documentation.swagger.web.OperationsSorter;
-import springfox.documentation.swagger.web.TagsSorter;
-import springfox.documentation.swagger.web.UiConfiguration;
-import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 @Configuration
 public class SwaggerDocumentationConfig {
     @Bean
-    public Docket customImplementation() {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("PC Store REST Gateway")
-                .description("This is the API-definition for the basic data in the PC Store project")
-                .license("Apache 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-                .termsOfServiceUrl("")
-                .version("1.0.0")
-                .contact(new Contact("", "", ""))
-                .build();
+    public GroupedOpenApi publicApi() {
+        GroupedOpenApi.Builder groupedOpenApi = GroupedOpenApi.builder();
+        groupedOpenApi.group("pc-store");
+        groupedOpenApi.displayName("PC Store API");
+        groupedOpenApi.  packagesToScan("de.niko.pcstore.controller.api");
 
-        Tag internalOrderAPITag = new Tag(Tags.INTERNAL_ORDER_API_TAG, "API for manipulations with internal orders");
-
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("pc-store")
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("de.niko.pcstore.controller.api"))
-                .build()
-                .tags(internalOrderAPITag)
-                .directModelSubstitute(LocalDate.class, Date.class)
-                .directModelSubstitute(OffsetDateTime.class, Date.class)
-                .directModelSubstitute(Timestamp.class, Date.class)
-                .apiInfo(apiInfo);
+        return groupedOpenApi.build();
     }
 
     @Bean
-    public UiConfiguration uiConfig() {
-        return UiConfigurationBuilder.builder()
-                .deepLinking(true)
-                .displayOperationId(false)
-                .defaultModelsExpandDepth(1)
-                .defaultModelExpandDepth(1)
-                .defaultModelRendering(ModelRendering.EXAMPLE)
-                .displayRequestDuration(false)
-                .docExpansion(DocExpansion.LIST)
-                .filter(false)
-                .maxDisplayedTags(null)
-                .operationsSorter(OperationsSorter.METHOD)
-                .showExtensions(false)
-                .showCommonExtensions(false)
-                .tagsSorter(TagsSorter.ALPHA)
-                .supportedSubmitMethods(UiConfiguration.Constants.DEFAULT_SUBMIT_METHODS)
-                .validatorUrl(null)
-                .build();
+    public OpenAPI springShopOpenAPI() {
+        Contact contact = new Contact();
+        contact.setName("Niko");
+        contact.setEmail("example@test.de");
+
+        License license = new License();
+        license.name("Apache 2.0");
+        license.url("http://www.apache.org/licenses/LICENSE-2.0.html");
+
+        Info info = new Info();
+        info.title("PC Store REST Gateway");
+        info.description("This is the API-definition for the basic data in the PC Store project");
+        info.version("v1.0.0");
+        info.license(license);
+        info.contact(contact);
+
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.info(info);
+
+        return openAPI;
     }
 }

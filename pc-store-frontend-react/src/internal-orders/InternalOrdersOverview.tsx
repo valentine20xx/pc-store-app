@@ -1,10 +1,10 @@
-import React from "react";
-import {Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow} from "@mui/material";
 import NewInternalOrder from "./new-internal-order/NewInternalOrder";
 import "./InternalOrdersOverview.css";
 // import {Edit as EditIcon} from '@mui/icons-material';
 import EditIcon from "@mui/icons-material/Edit";
-
+import moment from "moment";
 
 export interface DefaultDTOObject {
     id: string;
@@ -19,16 +19,18 @@ export interface InternalOrderShortDTO extends DefaultDTOObject {
 }
 
 const InternalOrdersOverview = () => {
-    const rows: InternalOrderShortDTO[] = [
-        {
-            id: generateId(),
-            version: new Date(),
-            client: "Ololo, Trololo",
-            personalComputer: "i7, 6700XT",
-            status: "open",
-            dateOfReceiving: new Date(),
-        }
-    ];
+    // const rows: InternalOrderShortDTO[] = [
+    //     {
+    //         id: generateId(),
+    //         version: new Date(),
+    //         client: "Ololo, Trololo",
+    //         personalComputer: "i7, 6700XT",
+    //         status: "open",
+    //         dateOfReceiving: new Date(),
+    //     }
+    // ];
+
+    const [rows, setRows] = useState<InternalOrderShortDTO[]>([]);
 
     const [open, setOpen] = React.useState(false);
 
@@ -38,6 +40,36 @@ const InternalOrdersOverview = () => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    useEffect(() => {
+        fetch("http://localhost:8080/internal-order-list")
+            .then(value => {
+                return value.json();
+            })
+            .then(
+                (result) => {
+                    const objs = (result as InternalOrderShortDTO[]).map(value => {
+                        return {...value, dateOfReceiving: moment(value.dateOfReceiving, "yyyy-MM-dd").toDate()}
+                    })
+                    setRows(objs);
+                },
+                (error) => {
+                    console.error(error);
+                }
+            )
+    }, [])
+
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     return (
@@ -61,22 +93,35 @@ const InternalOrdersOverview = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => (
-                            <TableRow key={row.id}>
-                                <TableCell align="left" style={{width: "35%"}}>{row.client}</TableCell>
-                                <TableCell align="left" style={{width: "35%"}}>{row.personalComputer}</TableCell>
-                                <TableCell align="left" style={{width: "15%"}}>{row.status}</TableCell>
-                                <TableCell align="left" style={{width: "15%"}}>{row.dateOfReceiving.toLocaleDateString()}</TableCell>
-                                <TableCell align="right" style={{width: "0"}}>
-                                    <Fab color="primary" size="small">
-                                        <EditIcon/>
-                                    </Fab>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {rows
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                                <TableRow key={row.id}>
+                                    <TableCell align="left" style={{width: "35%"}}>{row.client}</TableCell>
+                                    <TableCell align="left" style={{width: "35%"}}>{row.personalComputer}</TableCell>
+                                    <TableCell align="left" style={{width: "15%"}}>{row.status}</TableCell>
+                                    <TableCell align="left" style={{width: "15%"}}>{row.dateOfReceiving.toLocaleDateString()}</TableCell>
+                                    <TableCell align="right" style={{width: "0"}}>
+                                        <Fab color="primary" size="small">
+                                            <EditIcon/>
+                                        </Fab>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+
         </div>
     );
 }

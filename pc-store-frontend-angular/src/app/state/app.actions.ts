@@ -1,13 +1,14 @@
 import {createAction, props} from '@ngrx/store';
 import {Observable} from 'rxjs';
-import {InternalOrderDTO, InternalOrderShortDTO, NewInternalOrderMPDTO} from '../model/model';
+import {INTERNAL_ORDER_STATUSES, InternalOrderDTO, InternalOrderShortDTO, NewInternalOrderMPDTO} from '../model/model';
 
 const internalOrdersModule = '[Internal orders]';
 const internalOrderModule = '[Internal order]';
 const loginModule = '[Login]';
 
 export const loadInternalOrders = createAction(
-  `${internalOrdersModule} Load internal orders`
+  `${internalOrdersModule} Load internal orders`,
+  props<{ status: INTERNAL_ORDER_STATUSES }>()
 );
 
 export const loadInternalOrdersSuccess = createAction(

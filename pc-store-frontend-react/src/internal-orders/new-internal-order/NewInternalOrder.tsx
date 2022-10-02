@@ -1,14 +1,14 @@
-import {Button, Dialog, Snackbar, DialogActions, DialogContent, DialogTitle, Step, StepButton, Stepper, Zoom} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Step, StepButton, Stepper, Zoom} from "@mui/material";
 import React from "react";
 import ClientDataStep from "./new-internal-order-steps/ClientDataStep";
 import {TransitionProps} from "@mui/material/transitions";
 import PersonalComputerSpecificationsStep from "./new-internal-order-steps/PersonalComputerSpecificationsStep";
+import {useSnackbar} from "notistack";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const NewInternalOrder = ({open, handleClose}) => {
     const [activeStep, setActiveStep] = React.useState(0);
-    const [snackOpen, setSnackOpen] = React.useState(false);
     const [tab1Validation, setTab1Validation] = React.useState<Tab1Validation>({processor: {valid: true}, graphicsCard: {valid: true}});
     const [tab2Validation, setTab2Validation] = React.useState<Tab2Validation>({salutation: {valid: true}, name: {valid: true}, surname: {valid: true}});
     const [newInternalOrder, setNewInternalOrder] = React.useState<NewInternalOrderDTO>(
@@ -17,6 +17,8 @@ const NewInternalOrder = ({open, handleClose}) => {
             clientData: {name: "", surname: "", salutation: Saltuations.unset},
             files: [], privacyPolicy: false
         });
+
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
 
     const activeTab = (tab: number) => {
         switch (tab) {
@@ -40,8 +42,9 @@ const NewInternalOrder = ({open, handleClose}) => {
     const nextClick = () => {
         if (isFromStepValid(activeStep) && activeStep < stepLength()) {
             setActiveStep(activeStep + 1);
+            closeSnackbar();
         } else {
-            setSnackOpen(true);
+            enqueueSnackbar("Validation error", {variant: "error"});
         }
     }
 
@@ -49,46 +52,42 @@ const NewInternalOrder = ({open, handleClose}) => {
         handleClose();
         setNewInternalOrder({
             personalComputer: {processor: "", graphicsCard: ""},
-            clientData: {name: "", surname: "", salutation: Saltuations.male},
+            clientData: {name: "", surname: "", salutation: Saltuations.unset},
             files: [], privacyPolicy: false
         });
         setTab1Validation({processor: {valid: true}, graphicsCard: {valid: true}});
     }
 
     const isFromStepValid = (step: number): boolean => {
-        let valid = false;
+        let valid = true;
 
         if (step >= 0) {
-            console.log("check step 0");
             const processorValue = newInternalOrder.personalComputer.processor.trim();
             const graphicsCardValue = newInternalOrder.personalComputer.graphicsCard.trim();
 
             if (processorValue != "") {
                 tab1Validation.processor.valid = true;
-                valid = true;
             } else {
-                tab1Validation.processor.valid = false;
+                tab1Validation.processor.valid = valid = false;
             }
 
             if (graphicsCardValue != "") {
                 tab1Validation.graphicsCard.valid = true;
-                valid = true;
             } else {
-                tab1Validation.graphicsCard.valid = false;
+                tab1Validation.graphicsCard.valid = valid = false;
             }
+
+            setTab1Validation({...tab1Validation});
         }
         if (step >= 1) {
-            console.log("check step 1");
-
             const salutationValue = newInternalOrder.clientData.salutation;
             if (salutationValue == Saltuations.male || salutationValue == Saltuations.female) {
                 tab2Validation.salutation.valid = true;
-                valid = true;
             } else {
-                tab2Validation.salutation.valid = false;
-                valid = false;
+                tab2Validation.salutation.valid = valid = false;
             }
 
+            setTab2Validation({...tab2Validation});
         }
         if (step >= 2) {
             console.log("check step 2");
@@ -97,9 +96,63 @@ const NewInternalOrder = ({open, handleClose}) => {
             console.log("check step 3");
         }
 
-        setTab1Validation({...tab1Validation});
         console.log("return valid:", valid);
         return valid;
+    }
+
+    const createNewElement = () => {
+        const fd = new FormData();
+
+        const defaultObject = {
+            clientData: {
+                cellphone: "+49528252826",
+                city: "Nürnberg",
+                email: "example@test.de",
+                houseNumber: 110,
+                street: "Hauptstraße",
+                telephone: "+49528252826",
+                zip: 90459
+            },
+            personalComputer: {
+                computerCase: "MSI MAG Forge 100R",
+                motherboard: "Gigabyte B550 Aorus Pro V2",
+                powerSupplyUnit: "700W - be quiet! Pure power 11",
+                randomAccessMemory: "32GB Corsair Vengeance LPX DDR4-3000",
+                storageDevice: "250GB Samsung 870 EVO"
+            },
+            privacyPolicy: true
+        }
+
+        fd.set("internal-order", JSON.stringify({
+            clientData: {...newInternalOrder.clientData, ...defaultObject.clientData},
+            personalComputer: {...newInternalOrder.personalComputer, ...defaultObject.personalComputer},
+            privacyPolicy: newInternalOrder.privacyPolicy
+        }));
+
+        const requestOptions: RequestInit = {
+            method: "POST",
+            // headers: {"Content-Type": "multipart/form-data"},
+            body: fd
+        };
+        fetch("http://localhost:8080/internal-order-multipart", requestOptions)
+            .then(async response => {
+                console.log(response);
+                // const isJson = response.headers.get('content-type')?.includes('application/json');
+                // const data = isJson && await response.json();
+                //
+                // // check for error response
+                // if (!response.ok) {
+                //     // get error message from body or default to response status
+                //     const error = (data && data.message) || response.status;
+                //     return Promise.reject(error);
+                // }
+                // element.innerHTML = data.id;
+            })
+            .catch(error => {
+                console.error(error);
+                // element.parentElement.innerHTML = `Error: ${error}`;
+                // console.error('There was an error!', error);
+            });
     }
 
     return (
@@ -125,9 +178,10 @@ const NewInternalOrder = ({open, handleClose}) => {
                             </Step>
                             <Step onClick={event => {
                                 if (isFromStepValid(0)) {
-                                    setActiveStep(1)
+                                    setActiveStep(1);
+                                    closeSnackbar();
                                 } else {
-                                    setSnackOpen(true);
+                                    enqueueSnackbar("Validation error", {variant: "error"});
                                 }
                             }}>
                                 <StepButton color="inherit">
@@ -135,12 +189,11 @@ const NewInternalOrder = ({open, handleClose}) => {
                                 </StepButton>
                             </Step>
                             <Step onClick={event => {
-                                console.log("go1:");
                                 if (isFromStepValid(1)) {
-                                    console.log("go:");
-                                    setActiveStep(2)
+                                    setActiveStep(2);
+                                    closeSnackbar();
                                 } else {
-                                    setSnackOpen(true);
+                                    enqueueSnackbar("Validation error", {variant: "error"});
                                 }
                             }}>
                                 <StepButton color="inherit">
@@ -155,23 +208,13 @@ const NewInternalOrder = ({open, handleClose}) => {
                     {activeStep === stepLength() ?
                         (<Button onClick={() => {
                             // eslint-disable-next-line no-console
+                            createNewElement();
                             resetHandle();
                         }
                         }>Create</Button>) :
                         (<Button onClick={nextClick}>Next</Button>)}
                 </DialogActions>
             </Dialog>
-
-            <Snackbar
-                anchorOrigin={{vertical: "top", horizontal: "right"}}
-                open={snackOpen}
-                onClose={(event, reason) => {
-                    setSnackOpen(false);
-                }}
-                autoHideDuration={5000}
-                message="Errors!"
-                key={"errorSnack"}
-            />
         </React.Fragment>
     )
 }
@@ -191,7 +234,7 @@ const ZoomTransition = React.forwardRef((
 });
 
 export enum Saltuations {
-    male = "male", female = "female", unset = " "
+    male = "male", female = "female", unset = "unset"
 }
 
 export interface NewInternalOrderDTO {

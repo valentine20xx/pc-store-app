@@ -6,13 +6,13 @@ import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import java.io.File;
-import java.io.InputStream;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Api(tags = Tags.INTERNAL_ORDER_API_TAG)
+@Tag(name = Tags.INTERNAL_ORDER_API_TAG)
 public interface InternalOrderApi {
     String GET_INTERNAL_ORDER_LIST = "/internal-order-list";
     String GET_INTERNAL_ORDER = "/internal-order/{id}";
@@ -34,54 +34,76 @@ public interface InternalOrderApi {
     String DELETE_INTERNAL_ORDER = "/internal-order/{id}";
     String UPDATE_INTERNAL_ORDER_STATUS = "/internal-order/update-status";
 
-    @ApiOperation(value = "Delete a internal order")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "item deleted"),
-            @ApiResponse(code = 404, message = "an item is already deleted"),
-            @ApiResponse(code = 409, message = "an item is not deletable")})
+    @Operation(summary = "Delete a internal order")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "item deleted"),
+            @ApiResponse(responseCode = "404", description = "an item is already deleted"),
+            @ApiResponse(responseCode = "409", description = "an item is not deletable")
+    })
     @RequestMapping(value = DELETE_INTERNAL_ORDER,
             method = RequestMethod.DELETE)
-    ResponseEntity<Object> deleteGlobalVariable(@ApiParam(value = "pass the id of the internal order you want to delete", required = true) @PathVariable("id") String id);
+    ResponseEntity<Object> deleteGlobalVariable(
+            @Parameter(description = "pass the id of the internal order you want to delete", required = true)
+            @PathVariable("id")
+            String id);
 
-    @ApiOperation(value = "Get all internal orders", response = InternalOrderShortDTO.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "All internal orders", response = InternalOrderShortDTO.class, responseContainer = "List")})
+    @Operation(summary = "Get all internal orders")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "All internal orders"),
+    })
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(@RequestParam(required = false) @ApiParam(value = "Statuses of the internal order") List<InternalOrderDTO.Status> statuses);
+    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(
+            @RequestParam(required = false)
+            @Parameter(description = "Statuses of the internal order")
+            List<InternalOrderDTO.Status> statuses);
 
-    @ApiOperation(value = "Get one specific internal order", response = InternalOrderDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = InternalOrderDTO.class),
-            @ApiResponse(code = 400, message = "Bad input parameter"),
-            @ApiResponse(code = 404, message = "Not found"),
-            @ApiResponse(code = 500, message = "Internal server error", response = ErrorDTO.class)
+    @Operation(summary = "Get one specific internal order")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error"),
     })
     @RequestMapping(value = GET_INTERNAL_ORDER,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<InternalOrderDTO> getInternalOrder(@ApiParam(value = "internal order id", required = true) @PathVariable("id") String id);
+    ResponseEntity<InternalOrderDTO> getInternalOrder(
+            @Parameter(description = "Internal order id", required = true)
+            @PathVariable("id")
+            String id);
 
-    @ApiOperation(value = "Add a new internal order", response = InternalOrderDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Bad input parameter"),
-            @ApiResponse(code = 500, message = "Internal server error", response = ErrorDTO.class)})
+    @Operation(summary = "Add a new internal order")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "500", description = "Internal server error"),
+    })
     @RequestMapping(value = ADD_INTERNAL_ORDER,
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.POST)
-    ResponseEntity<InternalOrderDTO> addInternalOrder(@ApiParam(value = "Object to add") @RequestBody NewInternalOrderDTO internalOrderDTO);
+    ResponseEntity<InternalOrderDTO> addInternalOrder(
+            @Parameter(description = "Object to add")
+            @RequestBody
+            NewInternalOrderDTO internalOrderDTO);
 
-    @ApiOperation(value = "Update status of internal order", response = Object.class)
+
+    @Operation(summary = "Update status of internal order")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Bad input parameter"),
-            @ApiResponse(code = 304, message = "Status already set"),
-            @ApiResponse(code = 500, message = "Internal server error", response = ErrorDTO.class)})
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "304", description = "Status already set"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+    })
     @RequestMapping(value = UPDATE_INTERNAL_ORDER_STATUS,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<Object> updateInternalOrderStatus(@RequestParam("id") String internalOrderId, @RequestParam InternalOrderDTO.Status status);
+    ResponseEntity<Object> updateInternalOrderStatus(
+            @RequestParam("id")
+            String internalOrderId,
+            @RequestParam
+            @Parameter(description = "New status", schema = @Schema(implementation = InternalOrderDTO.Status.class))
+            InternalOrderDTO.Status status);
 }

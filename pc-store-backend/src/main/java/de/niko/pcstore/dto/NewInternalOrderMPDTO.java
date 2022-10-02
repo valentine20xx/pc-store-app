@@ -3,8 +3,7 @@ package de.niko.pcstore.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -16,69 +15,67 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel
 @SuperBuilder
 public class NewInternalOrderMPDTO {
     @JsonProperty
-    @ApiModelProperty(value = "Client data", required = true)
+    @Schema(description = "Client data", required = true)
     private NewClientDataMPDTO clientData;
 
     @JsonProperty
-    @ApiModelProperty(value = "Personal computer", required = true)
+    @Schema(description = "Personal computer", required = true)
     private NewPersonalComputerMPDTO personalComputer;
 
     @JsonProperty
-    @ApiModelProperty(example = "true", value = "Data protection regulation agreement", required = true)
+    @Schema(description = "Data protection regulation agreement", example = "true", required = true)
     private Boolean privacyPolicy;
 
     @JsonProperty("files")
-    @ApiModelProperty("files")
+    @Schema(description = "files", required = true)
     private List<NewInternalOrderFileMPDTO> internalOrderFiles;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @ApiModel
     @SuperBuilder
     public static class NewClientDataMPDTO {
         @JsonProperty
-        @ApiModelProperty(example = "male", value = "Gender of the candidate", required = true)
+        @Schema(description = "Gender of the customer", example = "male", required = true)
         private Salutation salutation;
 
         @JsonProperty
-        @ApiModelProperty(example = "John", value = "Name of the candidate", required = true)
+        @Schema(description = "Name of the customer", example = "John", required = true)
         private String name;
 
         @JsonProperty
-        @ApiModelProperty(example = "Smith", value = "Surname of the candidate", required = true)
+        @Schema(description = "Surname of the customer", example = "Smith", required = true)
         private String surname;
 
         @JsonProperty
-        @ApiModelProperty(example = "Hauptstraße", value = "Name of the street", required = true)
+        @Schema(description = "Name of the street", example = "Hauptstraße", required = true)
         private String street;
 
         @JsonProperty
-        @ApiModelProperty(example = "110", value = "Number of the house, where the candidate lives. Requires only when street specified", required = true)
+        @Schema(description = "Number of the house, where the customer lives. Requires only when street specified", example = "110", required = true)
         private String houseNumber;
 
         @JsonProperty
-        @ApiModelProperty(example = "90459", value = "Zip code", required = true)
+        @Schema(description = "Zip code", example = "90459", required = true)
         private Integer zip;
 
         @JsonProperty
-        @ApiModelProperty(example = "Nürnberg", value = "Name of the city", required = true)
+        @Schema(description = "Name of the city", example = "Nürnberg", required = true)
         private String city;
 
         @JsonProperty
-        @ApiModelProperty(example = "+49528252826", value = "Telephone of the candidate for communication")
+        @Schema(description = "Telephone of the customer for communication", example = "+49528252826")
         private String telephone;
 
         @JsonProperty
-        @ApiModelProperty(example = "+49528252826", value = "Mobile phone of the candidate for communication")
+        @Schema(description = "Mobile phone of the customer for communication", example = "+49528252826")
         private String cellphone;
 
         @JsonProperty
-        @ApiModelProperty(example = "example@test.de", value = "Email of the candidate for communication")
+        @Schema(description = "Email of the customer for communication", example = "example@test.de")
         private String email;
 
         public enum Salutation {
@@ -112,54 +109,52 @@ public class NewInternalOrderMPDTO {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @ApiModel
     @SuperBuilder
     public static class NewPersonalComputerMPDTO {
         @JsonProperty
-        @ApiModelProperty(example = "MSI MAG Forge 100R", value = "Name of the case", required = true)
+        @Schema(description = "Name of the case", example = "MSI MAG Forge 100R", required = true)
         private String computerCase;
 
         @JsonProperty
-        @ApiModelProperty(example = "Gigabyte B550 Aorus Pro V2", value = "Name of the motherboard", required = true)
+        @Schema(description = "Name of the motherboard", example = "Gigabyte B550 Aorus Pro V2", required = true)
         private String motherboard;
 
         @JsonProperty
-        @ApiModelProperty(example = "AMD Ryzen 7 5800X", value = "Name of the processor", required = true)
+        @Schema(description = "Name of the processor", example = "AMD Ryzen 7 5800X", required = true)
         private String processor;
 
         @JsonProperty
-        @ApiModelProperty(example = "AMD Radeon RX 6700 XT 12 GB", value = "Name of the graphics card", required = true)
+        @Schema(description = "Name of the graphics card", example = "AMD Radeon RX 6700 XT 12 GB", required = true)
         private String graphicsCard;
 
         @JsonProperty
-        @ApiModelProperty(example = "32GB Corsair Vengeance LPX DDR4-3000", value = "Name of the RAM", required = true)
+        @Schema(description = "Name of the RAM", example = "32GB Corsair Vengeance LPX DDR4-3000", required = true)
         private String randomAccessMemory;
 
         @JsonProperty
-        @ApiModelProperty(example = "250GB Samsung 870 EVO", value = "Name of the storage device", required = true)
+        @Schema(description = "Name of the storage device", example = "250GB Samsung 870 EVO", required = true)
         private String storageDevice;
 
         @JsonProperty
-        @ApiModelProperty(example = "700W - be quiet! Pure power 11", value = "Name of the power supply unit", required = true)
+        @Schema(description = "Name of the power supply unit", example = "700W - be quiet! Pure power 11", required = true)
         private String powerSupplyUnit;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @ApiModel
     @SuperBuilder
     public static class NewInternalOrderFileMPDTO {
         @JsonProperty("id")
-        @ApiModelProperty(example = "d290f1ee-6c54-4b01-90e6-d701748f0851", value = "Unique UUID", required = true)
+        @Schema(description = "Unique UUID", example = "d290f1ee-6c54-4b01-90e6-d701748f0851", required = true)
         private String id;
 
         @JsonProperty
-        @ApiModelProperty(example = "somefile.pdf", required = true, value = "Name of the file")
+        @Schema(description = "Name of the file", example = "somefile.pdf", required = true)
         private String name;
 
         @JsonProperty
-        @ApiModelProperty(example = "File is encrypted", value = "Notes with additional information")
+        @Schema(description = "Notes with additional information", example = "File is encrypted")
         private String note;
     }
 }

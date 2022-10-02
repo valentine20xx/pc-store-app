@@ -82,13 +82,17 @@ export interface NewInternalOrderMPDTO {
 
 export function getInternalOrderStatuses(): IdValuePair[] {
   return [
-    {id: 'open', value: 'Open'},
-    {id: 'checked', value: 'Checked'},
-    {id: 'producing', value: 'Producing'},
-    {id: 'produced', value: 'Produced'},
-    {id: 'sent', value: 'Sent'},
-    {id: 'closed', value: 'Closed'}
+    {id: INTERNAL_ORDER_STATUSES.OPEN, value: 'Open'},
+    {id: INTERNAL_ORDER_STATUSES.CHECKED, value: 'Checked'},
+    {id: INTERNAL_ORDER_STATUSES.PRODUCING, value: 'Producing'},
+    {id: INTERNAL_ORDER_STATUSES.PRODUCED, value: 'Produced'},
+    {id: INTERNAL_ORDER_STATUSES.SENT, value: 'Sent'},
+    {id: INTERNAL_ORDER_STATUSES.CLOSED, value: 'Closed'}
   ];
+}
+
+export enum INTERNAL_ORDER_STATUSES {
+  OPEN = 'open', CHECKED = 'checked', PRODUCING = 'producing', PRODUCED = 'produced', SENT = 'sent', CLOSED = 'closed'
 }
 
 export function getSalutations(): IdValuePair[] {

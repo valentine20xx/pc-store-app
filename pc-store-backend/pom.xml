@@ -17,12 +17,11 @@
     <properties>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <java.version>11</java.version>
-        <springfox.version>3.0.0</springfox.version>
-        <log4j.version>2.17.0</log4j.version>
+        <log4j.version>2.17.2</log4j.version>
         <jackson.version>2.13.1</jackson.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <modelmapper.version>2.4.5</modelmapper.version>
+        <modelmapper.version>3.1.0</modelmapper.version>
         <commons-io.version>2.11.0</commons-io.version>
     </properties>
 
@@ -53,18 +52,11 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <!-- SpringFox dependencies -->
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox.version}</version>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>2.7.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
         <dependency>
@@ -116,6 +108,52 @@
             <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
+
+
+
+<!--        -->
+<!--        <dependency>-->
+<!--            <groupId>io.swagger.core.v3</groupId>-->
+<!--            <artifactId>swagger-jaxrs2</artifactId>-->
+<!--            <version>${swagger-core-version}</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; inflector library &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>io.swagger</groupId>-->
+<!--            <artifactId>swagger-inflector</artifactId>-->
+<!--            <version>${swagger-inflector-version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.swagger.parser.v3</groupId>-->
+<!--            <artifactId>swagger-parser</artifactId>-->
+<!--            <version>${swagger-parser-version}</version>-->
+<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
+<!--        <dependency>-->
+<!--            <groupId>io.swagger.core.v3</groupId>-->
+<!--            <artifactId>swagger-annotations</artifactId>-->
+<!--            <version>2.2.1</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.springdoc</groupId>-->
+<!--            <artifactId>springdoc-openapi-webmvc-core</artifactId>-->
+<!--            <version>${org.springdoc.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springdoc</groupId>-->
+<!--            <artifactId>springdoc-openapi-ui</artifactId>-->
+<!--            <version>${org.springdoc.version}</version>-->
+<!--        </dependency>-->
+        <!-- Swagger UI -->
+        <!--        https://www.javainuse.com/spring/boot_swagger3-->
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.9</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -125,6 +163,12 @@
                 <h2.version>1.4.200</h2.version>
             </properties>
             <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
                 <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
                 <dependency>
                     <groupId>com.h2database</groupId>
@@ -143,6 +187,12 @@
                 <h2.version>1.4.200</h2.version>
             </properties>
             <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
                 <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
                 <dependency>
                     <groupId>org.postgresql</groupId>

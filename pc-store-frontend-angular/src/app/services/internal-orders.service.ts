@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {delay, Observable, of, throwError} from 'rxjs';
-import {InternalOrderDTO, InternalOrderShortDTO, NewInternalOrderMPDTO} from '../model/model';
+import {INTERNAL_ORDER_STATUSES, InternalOrderDTO, InternalOrderShortDTO, NewInternalOrderMPDTO} from '../model/model';
 import {generateId} from '../utils/utils';
 import {HttpClient} from '@angular/common/http';
 
@@ -11,7 +11,10 @@ export class InternalOrdersService implements InternalOrders {
   constructor(private httpClient: HttpClient) {
   }
 
-  getInternalOrders(): Observable<InternalOrderShortDTO[]> {
+  getInternalOrders(status: INTERNAL_ORDER_STATUSES[]): Observable<InternalOrderShortDTO[]> {
+
+    console.debug('status:', status);
+
     return this.httpClient.get<InternalOrderShortDTO[]>('http://localhost:8080/internal-order-list')
   }
 
@@ -25,7 +28,7 @@ export class InternalOrdersService implements InternalOrders {
 }
 
 export interface InternalOrders {
-  getInternalOrders(): Observable<InternalOrderShortDTO[]>;
+  getInternalOrders(status: INTERNAL_ORDER_STATUSES[]): Observable<InternalOrderShortDTO[]>;
 
   getInternalOrder(id: string): Observable<InternalOrderDTO>;
 
@@ -38,7 +41,7 @@ export class InternalOrdersServiceLocal implements InternalOrders {
   constructor() {
   }
 
-  getInternalOrders(): Observable<InternalOrderShortDTO[]> {
+  getInternalOrders(status: INTERNAL_ORDER_STATUSES[]): Observable<InternalOrderShortDTO[]> {
     console.warn('Local');
 
     if (this.counter > 1) {

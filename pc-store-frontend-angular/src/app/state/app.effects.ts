@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {catchError, delay, Observable, of, switchMap, tap} from 'rxjs';
+import {catchError, delay, of, switchMap} from 'rxjs';
+import {INTERNAL_ORDER_STATUSES} from '../model/model';
 import {InternalOrdersService} from '../services/internal-orders.service';
 import {ILoadInternalOrder, loadInternalOrder, loadInternalOrderClosed, loadInternalOrders, loadInternalOrdersClosed, loadInternalOrdersFailure, loadInternalOrdersSuccess, loadInternalOrderSuccess, login, loginSuccess, logout, logoutSuccess} from './app.actions';
 
@@ -13,8 +14,8 @@ export class InternalOrderEffects {
   loadInternalOrdersEffect = createEffect(() =>
     this.actions$.pipe(
       ofType(loadInternalOrders.type),
-      switchMap(() => {
-          return this.internalOrdersService.getInternalOrders().pipe(
+      switchMap((value: { status: INTERNAL_ORDER_STATUSES }) => {
+          return this.internalOrdersService.getInternalOrders([value.status]).pipe(
             switchMap(
               value => {
                 return of(loadInternalOrdersSuccess({

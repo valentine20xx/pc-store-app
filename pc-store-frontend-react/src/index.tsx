@@ -5,11 +5,16 @@ import reportWebVitals from "./reportWebVitals";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import App from "./App";
 import InternalOrdersOverview from "./internal-orders/InternalOrdersOverview";
+import {SnackbarProvider} from "notistack";
 
 ReactDOM.render(
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<App/>}>
+            <Route path="/" element={
+                <SnackbarProvider maxSnack={7} autoHideDuration={null} anchorOrigin={{vertical: "top", horizontal: "right"}} preventDuplicate={true}>
+                    <App/>
+                </SnackbarProvider>
+            }>
                 <Route
                     path="/internal-orders-overview"
                     element={<InternalOrdersOverview/>}

@@ -1,13 +1,12 @@
-import {DataSource} from '@angular/cdk/collections';
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {select, Store} from '@ngrx/store';
-import {Observable, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {AppState} from '../app.module';
-import {getInternalOrderStatuses, InternalOrderDTO, InternalOrderShortDTO} from '../model/model';
+import {getInternalOrderStatuses, INTERNAL_ORDER_STATUSES, InternalOrderDTO, InternalOrderShortDTO} from '../model/model';
 import {InternalOrdersService} from '../services/internal-orders.service';
 import {loadInternalOrder, loadInternalOrders} from '../state/app.actions';
 import {internalOrdersStateFeature, internalOrderStateFeature} from '../state/app.selectors';
@@ -56,7 +55,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
               this.loaderService.hideSpinner();
               this.internalOrderShortDataSource.data = [];
               this.errorOverlayService.showErrorOverlay('Unable to load internal orders', () => {
-                this.store.dispatch(loadInternalOrders());
+                this.store.dispatch(loadInternalOrders({status: INTERNAL_ORDER_STATUSES.OPEN}));
               });
               break;
           }
@@ -82,7 +81,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
       })
     )
 
-    this.store.dispatch(loadInternalOrders());
+    this.store.dispatch(loadInternalOrders({status: INTERNAL_ORDER_STATUSES.OPEN}));
   }
 
   ngAfterViewInit() {
@@ -91,7 +90,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
   }
 
   refreshClick(): void {
-    this.store.dispatch(loadInternalOrders());
+    this.store.dispatch(loadInternalOrders({status: INTERNAL_ORDER_STATUSES.OPEN}));
   }
 
   createNewOrderClick(): void {
@@ -111,7 +110,7 @@ export class InternalOrdersOverviewComponent implements OnInit, AfterViewInit, O
         })
 
         this.internalOrdersService.addInternalOrderMP(result.newInternalOrder, formDate).subscribe(value => {
-          this.store.dispatch(loadInternalOrders());
+          this.store.dispatch(loadInternalOrders({status: INTERNAL_ORDER_STATUSES.OPEN}));
         }, error => {
           console.error(error)
         });

@@ -2,8 +2,7 @@ package de.niko.pcstore.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,14 +11,13 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel
 @SuperBuilder
 public class NewInternalOrderFileDTO {
     @JsonProperty
-    @ApiModelProperty(example = "somefile.pdf", required = true, value = "Name of the file")
+    @Schema(description = "Name of the file", example = "somefile.pdf", required = true)
     private String name;
 
     @JsonProperty
-    @ApiModelProperty(example = "File is encrypted", value = "Notes with additional information")
+    @Schema(description = "Notes with additional information", example = "File is encrypted")
     private String note;
 }

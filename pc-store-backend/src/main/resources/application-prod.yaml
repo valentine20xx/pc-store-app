@@ -26,16 +26,10 @@ spring:
   config:
     activate:
       on-profile: prod
+
 logging:
   level: warn
 
-springfox:
-  documentation:
+springdoc:
+  swagger-ui:
     enabled: false
-    swagger-ui:
-      enabled: false
-    open-api:
-      enabled: false
-    swagger:
-      v2:
-        enabled: false

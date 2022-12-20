@@ -1,0 +1,36 @@
+POST http://localhost:8081/engine-rest/process-definition/key/main-process-id/start
+Content-Type: application/json
+
+{
+  "variables": {
+    "order-id": {
+      "value": "b3a4a26b-0ea5-44c0-aeed-db2175ca5994",
+      "type": "String"
+    }
+  },
+  "businessKey": "myBusinessKey + order-id uuid"
+}
+
+###
+GET http://localhost:8080/engine-rest/task?candidateGroup=builders
+Content-Type: application/json
+
+###
+### processInstanceId
+GET http://localhost:8080/engine-rest/process-instance/e9e28221-48cb-11ed-9d49-9eb6d0696e1f/variables
+Content-Type: application/json
+
+
+###
+### id
+POST http://localhost:8080/engine-rest/task/e9e6eef9-48cb-11ed-9d49-9eb6d0696e1f/submit-form
+Content-Type: application/json
+
+{
+  "variables": {
+    "status": {
+      "value": "produced",
+      "type": "String"
+    }
+  }
+}

@@ -1,260 +1,342 @@
 package de.niko.pcstore.controller.api;
 
+import de.niko.pcstore.configuration.MapperConfiguration;
 import de.niko.pcstore.dto.InternalOrderDTO;
-import de.niko.pcstore.dto.NewInternalOrderDTO;
-import de.niko.pcstore.dto.NewInternalOrderFileDTO;
-import de.niko.pcstore.dto.NewInternalOrderMPDTO;
+import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.entity.InternalOrderEntity;
-import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import java.io.File;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import javax.servlet.ServletContext;
-import javax.transaction.Transactional;
-import org.assertj.core.api.Assertions;
+import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.Invocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 @AutoConfigureTestEntityManager
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("Test InternalOrderApiController")
+@Import(MapperConfiguration.class)
 public class InternalOrderApiControllerTest {
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private TestRestTemplate testRestTemplate;
-
-    @Autowired
+    @MockBean
     private InternalOrderRepository internalOrderRepository;
-
     @Autowired
-    private TestEntityManager testEntityManager;
-
-    @Autowired
-    private InternalOrderApi internalOrderApi;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private ServletContext servletContext;
-
-    @Test
-    @DisplayName("Test updateInternalOrderStatus")
-    @Transactional
-    @Sql("/test-data.sql")
-    public void updateInternalOrderStatusTest() {
-//        String BASE_URI = "http://localhost:" + port;
-//        String url = BASE_URI + InternalOrderApi.UPDATE_INTERNAL_ORDER_STATUS;
-//        Map<String, String> urlVariables = new HashMap<>();
-//        urlVariables.put("id", "INTERNAL_ORDER_ID_1");
-//        urlVariables.put("status", "producing");
-//        ResponseEntity<Object> responseEntity = testRestTemplate.getForEntity(url + "?id=INTERNAL_ORDER_ID_1&status=producing", Object.class);
-        {
-            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
-
-            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.OPEN);
-        }
-        {
-            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        }
-        {
-            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
-
-            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.PRODUCING);
-        }
-        {
-            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
-        }
-    }
-
-    @Test
-    @DisplayName("Test upload")
-    @Transactional
-    @Sql("/test-data.sql")
-    public void uploadTest() {
-        String BASE_URI = "http://localhost:" + port;
-
-        String idForUpload;
-        {
-            NewInternalOrderDTO internalOrderDTO = NewInternalOrderDTO.builder().clientData(
-                    NewInternalOrderDTO.NewClientDataDTO.builder().name("CD-name-1").surname("CD-name-2").build()
-            ).personalComputer(
-                    NewInternalOrderDTO.NewPersonalComputerDTO.builder().processor("PC-processor-1").graphicsCard("PC-graphicsCard-1").build()
-            ).build();
-            HttpEntity<NewInternalOrderDTO> requestEntity = new HttpEntity<>(internalOrderDTO);
-
-            String url = BASE_URI + InternalOrderApi.ADD_INTERNAL_ORDER;
-            ResponseEntity<InternalOrderDTO> responseEntity = testRestTemplate.postForEntity(url, requestEntity, InternalOrderDTO.class);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
-
-            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
-
-            idForUpload = internalOrderSavedDTO.getId();
-        }
-        {
-            String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_UPLOAD;
-
-            NewInternalOrderFileDTO internalOrderFileDTO = NewInternalOrderFileDTO.builder().name("IOF-1").note("bla-bla-bla").build();
-
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-            form.add("internal-order-file", internalOrderFileDTO);
-            form.add("file", new FileSystemResource(new File("README.md")));
-
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(form, httpHeaders);
-
-            Map<String, String> urlVariables = new HashMap<>();
-            urlVariables.put("internal-order-id", idForUpload);
-
-            ResponseEntity<String> responseEntity = testRestTemplate.postForEntity(url, requestEntity, String.class, urlVariables);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        }
-    }
-
-    @Test
-    @DisplayName("Test addInternalOrderMultipart + download")
-    @Transactional // a Session is needed (otherwise: failed to lazily initialize)
-    @Sql("/test-data.sql")
-    public void addInternalOrderMultipartTest() {
-        String BASE_URI = "http://localhost:" + port;
-
-        String idForDownload;
-        String personalComputerSavedId;
-        {
-            String url = BASE_URI + InternalOrderApiController.ADD_INTERNAL_ORDER_MULTIPART;
-
-            NewInternalOrderMPDTO internalOrderDTO = NewInternalOrderMPDTO.builder().personalComputer(
-                    NewInternalOrderMPDTO.NewPersonalComputerMPDTO.builder().computerCase("PC-computerCase").build()
-            ).clientData(
-                    NewInternalOrderMPDTO.NewClientDataMPDTO.builder().name("CD-name").surname("CD-surname").build()
-            ).internalOrderFiles(List.of(NewInternalOrderMPDTO.NewInternalOrderFileMPDTO.builder().id("UUID-FILE-1").name("test-file-pom.xml").build())).build();
-
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-            form.add("internal-order", internalOrderDTO);
-            form.add("UUID-FILE-1", new FileSystemResource(new File("pom.xml")));
-
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(form, httpHeaders);
-
-            ResponseEntity<InternalOrderDTO> responseEntity = testRestTemplate.postForEntity(url, requestEntity, InternalOrderDTO.class);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
-            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getId()).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getVersion()).isNotNull();
-            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.OPEN);
-            Assertions.assertThat(internalOrderSavedDTO.getDateOfReceiving()).isNotNull();
-
-            personalComputerSavedId = internalOrderSavedDTO.getId();
-
-            List<InternalOrderDTO.InternalOrderFileDTO> internalOrderFiles = internalOrderSavedDTO.getInternalOrderFiles();
-
-            Assertions.assertThat(internalOrderFiles).isNotNull();
-            Assertions.assertThat(internalOrderFiles.size()).isEqualTo(1);
-
-            idForDownload = internalOrderFiles.get(0).getId();
-        }
-        {
-            String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_DOWNLOAD;
-
-            Map<String, String> urlVariables = new HashMap<>();
-            urlVariables.put("metadata-id", idForDownload);
-
-            ResponseEntity<byte[]> responseEntity = testRestTemplate.getForEntity(url, byte[].class, urlVariables);
-
-            Assertions.assertThat(responseEntity).isNotNull();
-            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            byte[] fileByteArray = responseEntity.getBody();
-            Assertions.assertThat(fileByteArray).isNotNull();
-        }
-        {
-            Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(personalComputerSavedId);
-
-            internalOrderEntityOptional.ifPresentOrElse(internalOrderEntity -> {
-                Assertions.assertThat(internalOrderEntity).isNotNull();
-                Assertions.assertThat(internalOrderEntity.getId()).isEqualTo(personalComputerSavedId);
-
-                Set<InternalOrderFileMetadataEntity> internalOrderFileMetadataEntities = internalOrderEntity.getInternalOrderFileMetadataEntities();
-
-                Assertions.assertThat(internalOrderFileMetadataEntities).isNotNull();
-                Assertions.assertThat(internalOrderFileMetadataEntities.size()).isEqualTo(1);
-
-                internalOrderFileMetadataEntities.forEach(candidateFileEntity -> {
-                    Assertions.assertThat(candidateFileEntity.getId()).isNotEqualTo(candidateFileEntity.getInternalOrderEntity().getId());
-                });
-            }, () -> {
-                throw new RuntimeException("No personal computer was found");
-            });
-        }
-    }
+    private InternalOrderApiController internalOrderApiController;
 
     @BeforeEach
-    private void initializeDatabase() {
-        Assertions.assertThat(port).isNotNull();
-        Assertions.assertThat(testRestTemplate).isNotNull();
-        Assertions.assertThat(internalOrderRepository).isNotNull();
-        Assertions.assertThat(testEntityManager).isNotNull();
-        Assertions.assertThat(internalOrderApi).isNotNull();
+    public void beforeTest() {
+        Mockito.reset(internalOrderRepository);
+    }
+
+    @Test
+    @DisplayName("Test getInternalOrderList without statuses")
+    public void getInternalOrderList() {
+        InternalOrderEntity internalOrderEntity1 = new InternalOrderEntity();
+        internalOrderEntity1.setId(UUID.randomUUID().toString());
+        internalOrderEntity1.setVersion(Timestamp.from(Instant.now()));
+
+        InternalOrderEntity internalOrderEntity2 = new InternalOrderEntity();
+        internalOrderEntity2.setId(UUID.randomUUID().toString());
+        internalOrderEntity2.setVersion(Timestamp.from(Instant.now()));
+
+        Mockito.when(internalOrderRepository.findAll()).thenReturn(Arrays.asList(internalOrderEntity1, internalOrderEntity2));
+
+        ResponseEntity<List<InternalOrderShortDTO>> internalOrderList = internalOrderApiController.getInternalOrderList(Collections.emptyList());
+
+        Assertions.assertNotNull(internalOrderList);
+        Assertions.assertEquals(HttpStatus.OK, internalOrderList.getStatusCode());
+
+        Assertions.assertNotNull(internalOrderList.getBody());
+        Assertions.assertEquals(2, internalOrderList.getBody().size());
+    }
+
+    @Test
+    @DisplayName("Test getInternalOrder")
+    public void getInternalOrder() {
+        String ID = UUID.randomUUID().toString();
+
+        InternalOrderEntity internalOrderEntity1 = new InternalOrderEntity();
+        internalOrderEntity1.setId(ID);
+        internalOrderEntity1.setVersion(Timestamp.from(Instant.now()));
+
+        Mockito.when(internalOrderRepository.findById(Mockito.eq(ID))).thenReturn(Optional.of(internalOrderEntity1));
+
+        ResponseEntity<InternalOrderDTO> internalOrderDTOResponseEntity = internalOrderApiController.getInternalOrder(ID);
+
+        Assertions.assertNotNull(internalOrderDTOResponseEntity);
+        Assertions.assertEquals(HttpStatus.OK, internalOrderDTOResponseEntity.getStatusCode());
+
+        Assertions.assertNotNull(internalOrderDTOResponseEntity.getBody());
+        Assertions.assertEquals(ID, internalOrderDTOResponseEntity.getBody().getId());
+    }
+
+
+    @Test
+    @DisplayName("Test addInternalOrderMultipart")
+    public void addInternalOrderMultipartTest() throws Exception {
+        StandardMultipartHttpServletRequest standardMultipartHttpServletRequest = Mockito.mock(StandardMultipartHttpServletRequest.class);
+
+        Assertions.assertNotNull(standardMultipartHttpServletRequest);
+
+        InternalOrderEntity internalOrderEntity1 = new InternalOrderEntity();
+        internalOrderEntity1.setId(UUID.randomUUID().toString());
+
+        File addInternalOrderMultipartFile = ResourceUtils.getFile("classpath:addInternalOrderMultipart.json");
+        String addInternalOrderMultipartJson = FileUtils.readFileToString(addInternalOrderMultipartFile, StandardCharsets.UTF_8);
+
+        Mockito.when(standardMultipartHttpServletRequest.getParameter(Mockito.eq("internal-order"))).thenReturn(addInternalOrderMultipartJson);
+
+        MultipartFile multipartFile = Mockito.mock(MultipartFile.class);
+        Mockito.when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0});
+        Mockito.when(multipartFile.getContentType()).thenReturn("TestContentType");
+
+        Mockito.when(standardMultipartHttpServletRequest.getFile(Mockito.eq("testId1"))).thenReturn(multipartFile);
+        Mockito.when(internalOrderRepository.saveAndFlush(Mockito.any())).thenReturn(internalOrderEntity1);
+
+        ResponseEntity<Object> objectResponseEntity = internalOrderApiController.addInternalOrderMultipart(standardMultipartHttpServletRequest);
+
+        Mockito.verify(internalOrderRepository, data -> {
+            List<Invocation> invocations = data.getAllInvocations();
+
+            Assertions.assertEquals(1, invocations.size());
+            InternalOrderEntity entity = (InternalOrderEntity) invocations.get(0).getArguments()[0];
+
+            Assertions.assertNotNull(entity);
+            Assertions.assertNull(entity.getId());
+
+            Assertions.assertNotNull(entity.getClientData());
+            Assertions.assertEquals("json1", entity.getClientData().getName());
+
+            Assertions.assertNotNull(entity.getPersonalComputer());
+
+            Assertions.assertNotNull(entity.getInternalOrderFileMetadataEntities());
+            Assertions.assertEquals(1, entity.getInternalOrderFileMetadataEntities().size());
+
+            entity.getInternalOrderFileMetadataEntities().forEach(internalOrderFileMetadataEntity -> {
+                Assertions.assertNull(internalOrderFileMetadataEntity.getId());
+                Assertions.assertNotNull(internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity());
+                Assertions.assertNull(internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity().getId());
+                Assertions.assertNotNull(internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity().getPayload());
+                Assertions.assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity().getPayload());
+                Assertions.assertNotNull(internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity().getMimeType());
+                Assertions.assertEquals("TestContentType", internalOrderFileMetadataEntity.getInternalOrderFilePayloadEntity().getMimeType());
+
+            });
+        }).saveAndFlush(Mockito.any());
+
+        Assertions.assertNotNull(objectResponseEntity);
+        Assertions.assertEquals(HttpStatus.OK, objectResponseEntity.getStatusCode());
     }
 }
 
+
+//    @Test
+//    @DisplayName("Test updateInternalOrderStatus")
+//    @Transactional
+//    @Sql("/test-data.sql")
+//    @Disabled
+//    public void updateInternalOrderStatusTest() {
+////        String BASE_URI = "http://localhost:" + port;
+////        String url = BASE_URI + InternalOrderApi.UPDATE_INTERNAL_ORDER_STATUS;
+////        Map<String, String> urlVariables = new HashMap<>();
+////        urlVariables.put("id", "INTERNAL_ORDER_ID_1");
+////        urlVariables.put("status", "producing");
+////        ResponseEntity<Object> responseEntity = testRestTemplate.getForEntity(url + "?id=INTERNAL_ORDER_ID_1&status=producing", Object.class);
+//        {
+//            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//
+//            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+//
+//            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+//            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.OPEN);
+//        }
+//        {
+//            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        }
+//        {
+//            ResponseEntity<InternalOrderDTO> responseEntity = internalOrderApi.getInternalOrder("INTERNAL_ORDER_ID_1");
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//
+//            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+//
+//            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+//            Assertions.assertThat(internalOrderSavedDTO.getStatus()).isEqualTo(InternalOrderDTO.Status.PRODUCING);
+//        }
+//        {
+//            ResponseEntity<Object> responseEntity = internalOrderApi.updateInternalOrderStatus("INTERNAL_ORDER_ID_1", InternalOrderDTO.Status.PRODUCING);
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Test upload")
+//    @Transactional
+//    @Sql("/test-data.sql")
+//    @Disabled
+//    public void uploadTest() {
+//        String BASE_URI = "http://localhost:";
+//
+//        String idForUpload;
+//        {
+//            NewInternalOrderDTO internalOrderDTO = NewInternalOrderDTO.builder().clientData(
+//                    NewInternalOrderDTO.NewClientDataDTO.builder().name("CD-name-1").surname("CD-name-2").build()
+//            ).personalComputer(
+//                    NewInternalOrderDTO.NewPersonalComputerDTO.builder().processor("PC-processor-1").graphicsCard("PC-graphicsCard-1").build()
+//            ).build();
+//            HttpEntity<NewInternalOrderDTO> requestEntity = new HttpEntity<>(internalOrderDTO);
+//
+//            String url = BASE_URI + InternalOrderApi.ADD_INTERNAL_ORDER;
+//            ResponseEntity<InternalOrderDTO> responseEntity = testRestTemplate.postForEntity(url, requestEntity, InternalOrderDTO.class);
+////            URI uri = testRestTemplate.postForLocation(url, requestEntity);
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//
+//            InternalOrderDTO internalOrderSavedDTO = responseEntity.getBody();
+//
+//            Assertions.assertThat(internalOrderSavedDTO).isNotNull();
+//
+//            idForUpload = internalOrderSavedDTO.getId();
+//        }
+//        {
+//            String url = BASE_URI + InternalOrderApiController.INTERNAL_ORDER_FILE_UPLOAD;
+//
+//            NewInternalOrderFileDTO internalOrderFileDTO = NewInternalOrderFileDTO.builder().name("IOF-1").note("bla-bla-bla").build();
+//
+//            HttpHeaders httpHeaders = new HttpHeaders();
+//            httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+//            form.add("internal-order-file", internalOrderFileDTO);
+//            form.add("file", new FileSystemResource(new File("README.md")));
+//
+//            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(form, httpHeaders);
+//
+//            Map<String, String> urlVariables = new HashMap<>();
+//            urlVariables.put("internal-order-id", idForUpload);
+//
+//            ResponseEntity<String> responseEntity = testRestTemplate.postForEntity(url, requestEntity, String.class, urlVariables);
+//
+//            Assertions.assertThat(responseEntity).isNotNull();
+//            Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        }
+//    }
+//
+
+//
+//    @BeforeEach
+//    private void initializeDatabase() {
+//        Assertions.assertThat(testRestTemplate).isNotNull();
+//        Assertions.assertThat(internalOrderRepository).isNotNull();
+//        Assertions.assertThat(testEntityManager).isNotNull();
+//        Assertions.assertThat(internalOrderApi).isNotNull();
+//    }
+//
+//    public static class RestTemplateLogger implements ClientHttpRequestInterceptor {
+//        private static final Logger LOG = LoggerFactory.getLogger(RestTemplateLogger.class);
+//        private static final String RTLM00001E = "RTLM00001E API Request per rest error " +
+//                "[Request: URI='{}', Method='{}', Headers='{}', Body='{}']" +
+//                "[Response: Code='{}', Text='{}', Headers='{}', Body='{}']";
+//        private static final String RTLM00001I = "RTLM00001I API Request per rest info " +
+//                "[Request: URI='{}', Method='{}', Headers='{}', Body='{}']" +
+//                "[Response: Code='{}', Text='{}', Headers='{}', Body='{}']";
+//
+//        @Override
+//        public ClientHttpResponse intercept(HttpRequest request, byte[] requestBodyBytes, ClientHttpRequestExecution execution) throws IOException {
+//            HttpHeaders requestHeaders = request.getHeaders();
+//            String requestMethod = request.getMethodValue();
+//            URI requestURI = request.getURI();
+//            String requestBody = new String(requestBodyBytes, Charset.defaultCharset());
+//
+//            ClientHttpResponse response = execution.execute(request, requestBodyBytes);
+//
+//            HttpStatus responseStatusCode = response.getStatusCode();
+//            String responseStatusText = response.getStatusText();
+//            HttpHeaders responseHeaders = response.getHeaders();
+//            InputStream responseBody = response.getBody();
+//            String responseBodyAsString = StreamUtils.copyToString(responseBody, Charset.defaultCharset());
+//
+//            if (responseStatusCode.isError()) {
+//                LOG.error(RTLM00001E, requestURI, requestMethod, requestHeaders, requestBody, responseStatusCode, responseStatusText, responseHeaders, responseBodyAsString);
+//            } else {
+//                LOG.info(RTLM00001I, requestURI, requestMethod, requestHeaders, requestBody, responseStatusCode, responseStatusText, responseHeaders, responseBodyAsString);
+//            }
+//
+//            return response;
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Test addPersonalComputer")
+//    @Disabled
+//    public void addPersonalComputerTest() {
+//        InternalOrderDTO.PersonalComputerDTO personalComputerDTO = InternalOrderDTO.PersonalComputerDTO.builder().computerCase("test-new-computer-case-1").build();
+////        ResponseEntity<InternalOrderDTO.PersonalComputerDTO> responseEntity = personalComputerApi.addPersonalComputer(personalComputerDTO);
+//        String BASE_URI = "http://localhost:";
+//        String url = BASE_URI + InternalOrderApiController.ADD_INTERNAL_ORDER;
+//
+//        NewInternalOrderDTO internalOrderDTO = new NewInternalOrderDTO();
+//
+//        ResponseEntity<InternalOrderDTO> responseEntity = testRestTemplate.postForEntity(url, internalOrderDTO, InternalOrderDTO.class);
+//
+//        Assertions.assertThat(responseEntity).isNotNull();
+//        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//
+////        InternalOrderDTO.PersonalComputerDTO personalComputerSavedDTO = responseEntity.getBody();
+////
+////        Assertions.assertThat(personalComputerSavedDTO).isNotNull();
+////        Assertions.assertThat(personalComputerSavedDTO.getId()).isNotNull();
+////        Assertions.assertThat(personalComputerSavedDTO.getVersion()).isNotNull();
+//    }
+//
+//    @Test
+//    @DisplayName("Test getPersonalComputerList")
+//    @Disabled
+//    public void getPersonalComputersTest() {
+//        String BASE_URI = "http://localhost:";
+//        String url = BASE_URI + InternalOrderApiController.GET_INTERNAL_ORDER_LIST;
+//
+//        ResponseEntity<List> responseEntity = testRestTemplate.getForEntity(url, List.class);
+//
+//        Assertions.assertThat(responseEntity).isNotNull();
+//        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//
+//        List<InternalOrderShortDTO> personalComputerShortDTOList = (List<InternalOrderShortDTO>) responseEntity.getBody();
+//
+//        Assertions.assertThat(personalComputerShortDTOList).isNotNull();
+//        Assertions.assertThat(personalComputerShortDTOList.size()).isEqualTo(0);
+//    }
 //    @LocalServerPort
 //    private int port;
 //
@@ -281,35 +363,9 @@ public class InternalOrderApiControllerTest {
 //        Assertions.assertThat(responseEntityNotFound.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 //    }
 //
-//    @Test
-//    @DisplayName("Test addPersonalComputer")
-//    public void addPersonalComputerTest() {
-//        PersonalComputerDTO personalComputerDTO = PersonalComputerDTO.builder().computerCase("test-new-computer-case-1").build();
-//        ResponseEntity<PersonalComputerDTO> responseEntity = personalComputerApi.addPersonalComputer(personalComputerDTO);
+
 //
-//        Assertions.assertThat(responseEntity).isNotNull();
-//        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        PersonalComputerDTO personalComputerSavedDTO = responseEntity.getBody();
-//
-//        Assertions.assertThat(personalComputerSavedDTO).isNotNull();
-//        Assertions.assertThat(personalComputerSavedDTO.getId()).isNotNull();
-//        Assertions.assertThat(personalComputerSavedDTO.getVersion()).isNotNull();
-//    }
-//
-//    @Test
-//    @DisplayName("Test getPersonalComputerList")
-//    public void getPersonalComputersTest() {
-//        ResponseEntity<List<PersonalComputerShortDTO>> responseEntity = personalComputerApi.getPersonalComputerList();
-//
-//        Assertions.assertThat(responseEntity).isNotNull();
-//        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        List<PersonalComputerShortDTO> personalComputerShortDTOList = responseEntity.getBody();
-//
-//        Assertions.assertThat(personalComputerShortDTOList).isNotNull();
-//        Assertions.assertThat(personalComputerShortDTOList.size()).isEqualTo(2);
-//    }
+
 //
 //    @Test
 //    @DisplayName("Test updateCandidate 1")

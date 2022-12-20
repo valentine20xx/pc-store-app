@@ -15,11 +15,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public abstract class DefaultDTOObject {
     @JsonProperty("id")
-    @Schema(description = "Unique UUID", example = "d290f1ee-6c54-4b01-90e6-d701748f0851", required = true)
+    @Schema(description = "Unique UUID", example = "d290f1ee-6c54-4b01-90e6-d701748f0851", requiredMode = Schema.RequiredMode.REQUIRED)
     private String id;
 
     @JsonProperty("version")
-    @Schema(description = "Date of the last change", example = "2021-11-23T10:03:38.538", required = true)
+    @Schema(description = "Date of the last change", example = "2021-11-23T10:03:38.538", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private Timestamp version;
 }

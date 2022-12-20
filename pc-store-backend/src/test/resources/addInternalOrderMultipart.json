@@ -1,0 +1,15 @@
+{
+  "personalComputer": {},
+  "clientData": {
+    "salutation": "male",
+    "name": "json1",
+    "surname": "json2"
+  },
+  "files": [
+    {
+      "id": "testId1",
+      "name": "testName",
+      "note": "TestNotes"
+    }
+  ]
+}

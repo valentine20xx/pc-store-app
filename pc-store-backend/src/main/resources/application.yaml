@@ -11,3 +11,5 @@ logging:
   level:
     root: debug
 
+springdoc:
+  writer-with-order-by-keys: true

@@ -61,7 +61,7 @@ public class MapperConfiguration {
             Converter<String, InternalOrderDTO.ClientDataDTO.Salutation> converter2 = context -> {
                 String source = context.getSource();
 
-                return  InternalOrderDTO.ClientDataDTO.Salutation.fromString(source);
+                return InternalOrderDTO.ClientDataDTO.Salutation.fromString(source);
             };
 
             using(converter1).map(source.getInternalOrderFileMetadataEntities(), destination.getInternalOrderFiles());
@@ -100,18 +100,18 @@ public class MapperConfiguration {
         protected InternalOrderShortDTO convert(InternalOrderEntity internalOrderEntity) {
             PersonalComputerEntity personalComputer = internalOrderEntity.getPersonalComputer();
 
-            String processor = personalComputer.getProcessor();
-            String graphicsCard = personalComputer.getGraphicsCard();
+            String processor = personalComputer != null ? personalComputer.getProcessor() : "";
+            String graphicsCard = personalComputer != null ? personalComputer.getGraphicsCard() : "";
 
             ClientDataEntity clientDataEntity = internalOrderEntity.getClientData();
 
-            String name = clientDataEntity.getName();
-            String surname = clientDataEntity.getSurname();
+            String name = clientDataEntity != null ? clientDataEntity.getName() : "";
+            String surname = clientDataEntity != null ? clientDataEntity.getSurname() : "";
 
             String id = internalOrderEntity.getId();
             Timestamp version = internalOrderEntity.getVersion();
 
-            String status = internalOrderEntity.getStatus().toString();
+            String status = String.valueOf(internalOrderEntity.getStatus());
             LocalDate dateOfReceiving = internalOrderEntity.getDateOfReceiving();
 
             return InternalOrderShortDTO.builder()

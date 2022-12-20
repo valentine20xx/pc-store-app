@@ -13,10 +13,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ErrorDTO {
     @JsonProperty
-    @Schema(description = "Code of the error", example = "1", required = true)
+    @Schema(description = "Code of the error", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer code;
 
     @JsonProperty
-    @Schema(description = "Message of the error", example = "Error occurred", required = true)
+    @Schema(description = "Message of the error", example = "Error occurred", requiredMode = Schema.RequiredMode.REQUIRED)
     private String message;
 }

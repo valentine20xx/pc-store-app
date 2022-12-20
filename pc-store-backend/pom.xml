@@ -12,23 +12,36 @@
 
     <artifactId>pc-store-backend</artifactId>
     <!-- https://semver.org/lang/de/ -->
-    <version>2.0.0</version>
+    <version>1.0.0</version>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <java.version>11</java.version>
-        <log4j.version>2.17.2</log4j.version>
-        <jackson.version>2.13.1</jackson.version>
-        <lombok.version>1.18.22</lombok.version>
+        <log4j.version>2.19.0</log4j.version>
+        <jackson.version>2.14.0</jackson.version>
+        <lombok.version>1.18.24</lombok.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <modelmapper.version>3.1.0</modelmapper.version>
         <commons-io.version>2.11.0</commons-io.version>
+        <springdoc.version>1.6.13</springdoc.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+<!--                <exclusion>-->
+<!--                    <groupId>ch.qos.logback</groupId>-->
+<!--                    <artifactId>logback-classic</artifactId>-->
+<!--                </exclusion>-->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,7 +69,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>2.7.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
         <dependency>
@@ -108,59 +120,19 @@
             <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
-
-
-
-<!--        -->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.core.v3</groupId>-->
-<!--            <artifactId>swagger-jaxrs2</artifactId>-->
-<!--            <version>${swagger-core-version}</version>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash; inflector library &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger</groupId>-->
-<!--            <artifactId>swagger-inflector</artifactId>-->
-<!--            <version>${swagger-inflector-version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.parser.v3</groupId>-->
-<!--            <artifactId>swagger-parser</artifactId>-->
-<!--            <version>${swagger-parser-version}</version>-->
-<!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
-<!--        <dependency>-->
-<!--            <groupId>io.swagger.core.v3</groupId>-->
-<!--            <artifactId>swagger-annotations</artifactId>-->
-<!--            <version>2.2.1</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.springdoc</groupId>-->
-<!--            <artifactId>springdoc-openapi-webmvc-core</artifactId>-->
-<!--            <version>${org.springdoc.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.springdoc</groupId>-->
-<!--            <artifactId>springdoc-openapi-ui</artifactId>-->
-<!--            <version>${org.springdoc.version}</version>-->
-<!--        </dependency>-->
-        <!-- Swagger UI -->
-        <!--        https://www.javainuse.com/spring/boot_swagger3-->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.9</version>
+            <version>${springdoc.version}</version>
         </dependency>
-
     </dependencies>
 
     <profiles>
         <profile>
             <id>local</id>
             <properties>
-                <h2.version>1.4.200</h2.version>
+                <h2.version>2.1.214</h2.version>
             </properties>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
@@ -175,6 +147,16 @@
                     <artifactId>h2</artifactId>
                     <version>${h2.version}</version>
                 </dependency>
+                <!-- TODO: move to up dev -->
+                <!--                <dependency>-->
+                <!--                    <groupId>org.springframework.boot</groupId>-->
+                <!--                    <artifactId>spring-boot-starter-oauth2-client</artifactId>-->
+                <!--                </dependency>-->
+                <!--                <dependency>-->
+                <!--                    <groupId>org.springframework.boot</groupId>-->
+                <!--                    <artifactId>spring-boot-starter-security</artifactId>-->
+                <!--                </dependency>-->
+
             </dependencies>
             <build>
                 <finalName>${project.artifactId}-${project.version}-local-${maven.build.timestamp}</finalName>
@@ -183,8 +165,8 @@
         <profile>
             <id>dev</id>
             <properties>
-                <postgresql.version>42.2.24</postgresql.version>
-                <h2.version>1.4.200</h2.version>
+                <postgresql.version>42.5.0</postgresql.version>
+                <h2.version>2.1.214</h2.version>
             </properties>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
@@ -217,8 +199,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <postgresql.version>42.2.24</postgresql.version>
-                <h2.version>1.4.200</h2.version>
+                <postgresql.version>42.5.0</postgresql.version>
+                <h2.version>2.1.214</h2.version>
             </properties>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
@@ -233,6 +215,10 @@
                     <artifactId>h2</artifactId>
                     <version>${h2.version}</version>
                     <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-oauth2-client</artifactId>
                 </dependency>
             </dependencies>
             <build>
@@ -286,7 +272,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                     <mainClass>de.niko.pcstore.Application</mainClass>
                 </configuration>

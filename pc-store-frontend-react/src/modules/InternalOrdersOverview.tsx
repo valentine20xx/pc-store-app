@@ -1,48 +1,27 @@
-import React, {useEffect, useState} from "react";
-import {Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow} from "@mui/material";
-import NewInternalOrder from "./new-internal-order/NewInternalOrder";
+import React from "react";
+import {Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow} from "@mui/material";
 import "./InternalOrdersOverview.css";
-// import {Edit as EditIcon} from '@mui/icons-material';
 import EditIcon from "@mui/icons-material/Edit";
 import moment from "moment";
+import {NewInternalOrder} from "./internal-orders/new-internal-order/NewInternalOrder";
+import {InternalOrderShortDTO} from "../model/Model";
 
-export interface DefaultDTOObject {
-    id: string;
-    version: Date;
-}
-
-export interface InternalOrderShortDTO extends DefaultDTOObject {
-    client: string;
-    personalComputer: string;
-    status: string;
-    dateOfReceiving: Date;
-}
-
-const InternalOrdersOverview = () => {
-    // const rows: InternalOrderShortDTO[] = [
-    //     {
-    //         id: generateId(),
-    //         version: new Date(),
-    //         client: "Ololo, Trololo",
-    //         personalComputer: "i7, 6700XT",
-    //         status: "open",
-    //         dateOfReceiving: new Date(),
-    //     }
-    // ];
-
-    const [rows, setRows] = useState<InternalOrderShortDTO[]>([]);
-
+export const InternalOrdersOverview = () => {
+    const [rows, setRows] = React.useState<InternalOrderShortDTO[]>([]);
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleClose = (success: boolean) => {
         setOpen(false);
+        if (success) {
+            loadOrderList();
+        }
     };
 
-    useEffect(() => {
+    const loadOrderList = (): void => {
         fetch("http://localhost:8080/internal-order-list")
             .then(value => {
                 return value.json();
@@ -58,6 +37,10 @@ const InternalOrdersOverview = () => {
                     console.error(error);
                 }
             )
+    }
+
+    React.useEffect(() => {
+        loadOrderList();
     }, [])
 
     const [page, setPage] = React.useState(0);
@@ -76,13 +59,15 @@ const InternalOrdersOverview = () => {
         <div className="internal-orders-overview">
             <div style={{display: "flex", flexDirection: "row", gap: "1em"}}>
                 <Button variant="contained" onClick={handleClickOpen}>Create a new order</Button>
-                <Button variant="contained" color={"info"}>Refresh</Button>
+                <Button variant="contained" color="info" onClick={() => {
+                    loadOrderList();
+                }}>Refresh</Button>
             </div>
 
             <NewInternalOrder open={open} handleClose={handleClose}/>
 
             <TableContainer component={Paper}>
-                <Table size={"small"}>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell>Client</TableCell>
@@ -121,7 +106,6 @@ const InternalOrdersOverview = () => {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
-
         </div>
     );
 }
@@ -134,5 +118,3 @@ export function generateId() {
         return v.toString(16);
     });
 }
-
-export default InternalOrdersOverview;

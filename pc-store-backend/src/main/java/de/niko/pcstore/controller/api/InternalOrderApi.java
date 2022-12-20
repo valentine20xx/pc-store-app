@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = Tags.INTERNAL_ORDER_API_TAG)
+@SecurityRequirement(name = "javainuseapi")
 public interface InternalOrderApi {
     String GET_INTERNAL_ORDER_LIST = "/internal-order-list";
     String GET_INTERNAL_ORDER = "/internal-order/{id}";
@@ -43,7 +45,7 @@ public interface InternalOrderApi {
     @RequestMapping(value = DELETE_INTERNAL_ORDER,
             method = RequestMethod.DELETE)
     ResponseEntity<Object> deleteGlobalVariable(
-            @Parameter(description = "pass the id of the internal order you want to delete", required = true)
+            @Parameter(description = "Id of the internal order", required = true)
             @PathVariable("id")
             String id);
 
@@ -91,7 +93,7 @@ public interface InternalOrderApi {
 
 
     @Operation(summary = "Update status of internal order")
-    @ApiResponses(value = {
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad input parameter"),
             @ApiResponse(responseCode = "304", description = "Status already set"),
@@ -106,4 +108,17 @@ public interface InternalOrderApi {
             @RequestParam
             @Parameter(description = "New status", schema = @Schema(implementation = InternalOrderDTO.Status.class))
             InternalOrderDTO.Status status);
+
+    @Operation(summary = "Get personal computer configuration of an internal order")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+    })
+    @RequestMapping(value = GET_INTERNAL_ORDER_PERSONAL_COMPUTER,
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            method = RequestMethod.GET)
+    ResponseEntity<InternalOrderDTO.PersonalComputerDTO> getPersonalComputerConfigurationByOrderId(@Parameter(description = "Id of the internal order", required = true)
+                                                                                              @PathVariable("id")
+                                                                                              String id);
 }

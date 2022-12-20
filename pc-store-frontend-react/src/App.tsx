@@ -4,7 +4,7 @@ import {AppBar, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText
 import MenuIcon from "@mui/icons-material/Menu";
 import {Outlet, useNavigate} from "react-router-dom";
 
-const App = () => {
+export const App = () => {
     const [state, setState] = React.useState({
         menu: false
     });
@@ -58,18 +58,18 @@ const App = () => {
     );
 }
 
-const NavigationMenu: React.FC<{ state: { menu: boolean }, closeMenu: () => void, internalOrdersClick: () => void }> = ({state, closeMenu, internalOrdersClick}) => {
+const NavigationMenu = (props: { state: { menu: boolean }, closeMenu: () => void, internalOrdersClick: () => void }) => {
     return (
         <Drawer anchor={"left"}
-                open={state.menu}
-                onClose={closeMenu}>
+                open={props.state.menu}
+                onClose={props.closeMenu}>
             <div style={{width: "15em"}}>
                 <h2 style={{textAlign: "center"}}>Menu</h2>
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemText primary="Internal orders"
-                                          onClick={internalOrdersClick}
+                                          onClick={props.internalOrdersClick}
                             />
                         </ListItemButton>
                     </ListItem>
@@ -78,5 +78,3 @@ const NavigationMenu: React.FC<{ state: { menu: boolean }, closeMenu: () => void
         </Drawer>
     );
 }
-
-export default App;

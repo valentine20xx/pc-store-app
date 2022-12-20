@@ -1,9 +1,13 @@
 package de.niko.pcstore.repository;
 
+import de.niko.pcstore.entity.ClientDataEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,11 +29,11 @@ public class InternalOrderRepositoryTest {
     public void findAllTest() {
         List<InternalOrderEntity> internalOrderEntities = internalOrderRepository.findAll();
 
-        Assertions.assertThat(internalOrderEntities).isNotNull();
-        Assertions.assertThat(internalOrderEntities.size()).isEqualTo(1);
+        Assertions.assertNotNull(internalOrderEntities);
+        Assertions.assertEquals(3, internalOrderEntities.size());
         internalOrderEntities.forEach(internalOrderEntity -> {
-            Assertions.assertThat(internalOrderEntity.getId()).isNotNull();
-            Assertions.assertThat(internalOrderEntity.getVersion()).isNotNull();
+            Assertions.assertNotNull(internalOrderEntity.getId());
+            Assertions.assertNotNull(internalOrderEntity.getVersion());
         });
     }
 
@@ -38,17 +42,58 @@ public class InternalOrderRepositoryTest {
     @Sql("/test-data.sql")
     public void findByIdTest() {
         Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById("INTERNAL_ORDER_ID_1");
-        Assertions.assertThat(internalOrderEntityOptional.isPresent()).isTrue();
+        Assertions.assertTrue(internalOrderEntityOptional.isPresent());
 
         InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
-        Assertions.assertThat(internalOrderEntity.getId()).isEqualTo("INTERNAL_ORDER_ID_1");
+        Assertions.assertEquals("INTERNAL_ORDER_ID_1", internalOrderEntity.getId());
 
         internalOrderEntityOptional = internalOrderRepository.findById("not-found");
-        Assertions.assertThat(internalOrderEntityOptional.isEmpty()).isTrue();
+        Assertions.assertTrue(internalOrderEntityOptional.isEmpty());
     }
+
+    @Test
+    @DisplayName("Test findAllWithStatuses")
+    @Sql("/test-data.sql")
+    public void findAllWithStatusesTest() {
+        List<InternalOrderEntity> internalOrderEntities = internalOrderRepository.findAllWithStatuses(Arrays.asList(InternalOrderEntity.Status.OPEN, InternalOrderEntity.Status.CHECKED));
+
+        Assertions.assertNotNull(internalOrderEntities);
+        Assertions.assertEquals(2, internalOrderEntities.size());
+    }
+
+    @Test
+    @DisplayName("Test getFileMetadata")
+    public void getFileMetadataTest() {
+
+    }
+
+    @Test
+    @DisplayName("Test saveAndFlush")
+    public void saveAndFlushTest() {
+        InternalOrderEntity internalOrderEntity = new InternalOrderEntity();
+        internalOrderEntity.setStatus(InternalOrderEntity.Status.OPEN);
+
+        ClientDataEntity clientDataEntity = new ClientDataEntity();
+        clientDataEntity.setName("TestName");
+        clientDataEntity.setSurname("TestSurname");
+
+        internalOrderEntity.setClientData(clientDataEntity);
+
+        InternalOrderEntity internalOrderEntitySaved = internalOrderRepository.saveAndFlush(internalOrderEntity);
+
+        Assertions.assertNotNull(internalOrderEntitySaved.getId());
+        Assertions.assertEquals(36, internalOrderEntitySaved.getId().length());
+
+        Pattern pattern = Pattern.compile("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(internalOrderEntitySaved.getId());
+        Assertions.assertTrue(matcher.find());
+
+        Assertions.assertNotNull(internalOrderEntitySaved.getVersion());
+    }
+
 
     @BeforeEach
     private void initializeDatabase() {
-        Assertions.assertThat(internalOrderRepository).isNotNull();
+        Assertions.assertNotNull(internalOrderRepository);
     }
 }

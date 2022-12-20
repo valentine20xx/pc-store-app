@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class NewInternalOrderFileDTO {
     @JsonProperty
-    @Schema(description = "Name of the file", example = "somefile.pdf", required = true)
+    @Schema(description = "Name of the file", example = "somefile.pdf", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @JsonProperty

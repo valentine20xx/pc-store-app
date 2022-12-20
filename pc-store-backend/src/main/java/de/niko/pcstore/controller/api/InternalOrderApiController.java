@@ -11,10 +11,10 @@ import de.niko.pcstore.dto.NewInternalOrderMPDTOValidator;
 import de.niko.pcstore.entity.InternalOrderEntity;
 import de.niko.pcstore.entity.InternalOrderFileMetadataEntity;
 import de.niko.pcstore.entity.InternalOrderFilePayloadEntity;
+import de.niko.pcstore.entity.PersonalComputerEntity;
 import de.niko.pcstore.logging.InternalOrderApiLogMessages;
 import de.niko.pcstore.repository.InternalOrderRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -22,18 +22,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -78,7 +77,7 @@ public class InternalOrderApiController implements InternalOrderApi {
                 } else {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
-            } catch (org.springframework.dao.EmptyResultDataAccessException emptyResultDataAccessException) {
+            } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
                 emptyResultDataAccessException.printStackTrace();
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } catch (Exception e) {
@@ -95,10 +94,10 @@ public class InternalOrderApiController implements InternalOrderApi {
         if (statuses == null || statuses.size() == 0) {
             internalOrderEntities = internalOrderRepository.findAll();
         } else {
-            internalOrderEntities = internalOrderRepository.findAllWithStatuses(statuses.stream().map(status -> InternalOrderEntity.Status.fromString(status.getStatus())).collect(Collectors.toUnmodifiableList()));
+            internalOrderEntities = internalOrderRepository.findAllWithStatuses(statuses.stream().map(status -> InternalOrderEntity.Status.fromString(status.getStatus())).toList());
         }
 
-        var internalOrderDTOList = internalOrderEntities.stream().map(internalOrderEntity -> modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class)).collect(Collectors.toUnmodifiableList());
+        var internalOrderDTOList = internalOrderEntities.stream().map(internalOrderEntity -> modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class)).toList();
 
         return new ResponseEntity<>(internalOrderDTOList, HttpStatus.OK);
     }
@@ -148,6 +147,23 @@ public class InternalOrderApiController implements InternalOrderApi {
             internalOrderRepository.saveAndFlush(internalOrderEntity);
 
             return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public ResponseEntity<InternalOrderDTO.PersonalComputerDTO> getPersonalComputerConfigurationByOrderId(String orderId) {
+        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(orderId);
+
+        if (internalOrderEntityOptional.isPresent()) {
+            InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+
+            PersonalComputerEntity personalComputerEntity = internalOrderEntity.getPersonalComputer();
+
+            InternalOrderDTO.PersonalComputerDTO personalComputerDTO = modelMapper.map(personalComputerEntity, InternalOrderDTO.PersonalComputerDTO.class);
+
+            return new ResponseEntity<>(personalComputerDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -257,7 +273,7 @@ public class InternalOrderApiController implements InternalOrderApi {
     @RequestMapping(value = ADD_INTERNAL_ORDER_MULTIPART,
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             method = RequestMethod.POST)
-    public ResponseEntity<Object> addInternalOrderMultipart(StandardMultipartHttpServletRequest standardMultipartHttpServletRequest, BindingResult bindingResult) {
+    public ResponseEntity<Object> addInternalOrderMultipart(StandardMultipartHttpServletRequest standardMultipartHttpServletRequest) {
         String internalOrderAsJSON = standardMultipartHttpServletRequest.getParameter("internal-order");
 
         Optional<NewInternalOrderMPDTO> internalOrderDTOOptional = convertInternalOrderJSON2InternalOrderDTO(internalOrderAsJSON);

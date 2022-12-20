@@ -17,7 +17,7 @@ maven command: `mvn clean package -Pdev`
 
 #### Docker
 - Configure docker image:
-  - `docker run --name postgresql-dev -p 5432:5432 -e POSTGRES_PASSWORD=smartpassword -d postgres`
+  - `docker run --name postgresql-dev -p 5432:5432 -e POSTGRES_PASSWORD=pcstorepassword -d postgres`
 
 
 - Docker console commands for prepare postgre database:
@@ -25,7 +25,7 @@ maven command: `mvn clean package -Pdev`
   - `su postgres` - Switch user to postgres.
   - `psql` - start postgres console.
   - `CREATE USER pcstoreadmin WITH PASSWORD '6tfgv6zghb6';` - create a database user.
-  - `CREATE DATABASE smart;` - create a database schema.
+  - `CREATE DATABASE pcstore;` - create a database schema.
 
 ### Production
 Will be started with Postgres as database and security (TLS and authorization).
@@ -35,6 +35,10 @@ Will be started with Postgres as database and security (TLS and authorization).
 maven command: `mvn clean package -Pprod`
 
 ## Security
+
+### User management
+
+Keyclock
 
 #### Generate a TLS-certificate:
 
@@ -47,14 +51,14 @@ maven command: `mvn clean package -Pprod`
 [Documentation](documentation/DOCUMENTATION.md)
 
 ### Team
-| Role             | Name, Nachname | Email |
-|:-----------------|----------------|-------|
-| Architect        |                |       |
-| Business analyse |                |       |
-| System analyse   |                |       |
-| Development      |                |       |
-| Testing          |                |       |
-| Administration   |                |       |
+| Role             | Name, Nachname | E-mail |
+|:-----------------|----------------|--------|
+| Architect        |                |        |
+| Business analyse |                |        |
+| System analyse   |                |        |
+| Development      |                |        |
+| Testing          |                |        |
+| Administration   |                |        |
 
 ### TODO list
 
@@ -64,9 +68,14 @@ maven command: `mvn clean package -Pprod`
 - [x] Add client data
 - [x] Database initialization for tests
 - [ ] Split ApiControllers into service and controller 
-- [ ] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
+- [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
+- [ ] Migrate security from Basic to JWT
 
 ### Others
 
 debug request-response communication : `-Djavax.net.debug=ssl`
+`mvn dependency:tree`
 
+###### Links:
+- https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
+- https://www.baeldung.com/spring-boot-keycloak

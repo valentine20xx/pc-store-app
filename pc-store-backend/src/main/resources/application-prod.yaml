@@ -9,9 +9,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smart
-    username: smartadmin
-    password: 6tfgv6zghb6
+    url: jdbc:postgresql://localhost:5432/pcstore
+    username: pcstore_admin
+    password: qVbE2qGee7FJHV9Yiet2
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -28,7 +28,8 @@ spring:
       on-profile: prod
 
 logging:
-  level: warn
+  level:
+    root: warn
 
 springdoc:
   swagger-ui:

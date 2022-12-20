@@ -24,3 +24,4 @@ Build: npm run build
 - [x] eslint
 - [ ] Internal state
 - [ ] Environment variables
+- [ ] UI case diagram

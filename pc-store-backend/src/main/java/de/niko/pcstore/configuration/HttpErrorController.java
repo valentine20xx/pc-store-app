@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Slf4j
-@Controller
+//@Slf4j
+//@Controller
 public class HttpErrorController implements ErrorController {
     @RequestMapping("/error")
     public ResponseEntity<Object> error(HttpServletRequest request) {

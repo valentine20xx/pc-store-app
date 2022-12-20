@@ -21,20 +21,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class InternalOrderShortDTO extends DefaultDTOObject {
     @JsonProperty
-    @Schema(description = "Short description (surname, name)", example = "Smith, John", required = true)
+    @Schema(description = "Short description (surname, name)", example = "Smith, John", requiredMode = Schema.RequiredMode.REQUIRED)
     private String client;
 
     @JsonProperty
-    @Schema(description = "Short description (Processor, Graphics card)", example = "AMD Ryzen 7 5800X, AMD Radeon RX 6700 XT 12 GB", required = true)
+    @Schema(description = "Short description (Processor, Graphics card)", example = "AMD Ryzen 7 5800X, AMD Radeon RX 6700 XT 12 GB", requiredMode = Schema.RequiredMode.REQUIRED)
     private String personalComputer;
 
     @JsonProperty
-    @Schema(description = "When was a customer in the system created", example = "2020-09-11", required = true)
+    @Schema(description = "When was a customer in the system created", example = "2020-09-11", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfReceiving;
 
     @JsonProperty
-    @Schema(description = "Status of the order", example = "open", required = true)
+    @Schema(description = "Status of the order", example = "open", requiredMode = Schema.RequiredMode.REQUIRED)
     private Status status;
 
     public enum Status {

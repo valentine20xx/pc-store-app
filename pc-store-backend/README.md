@@ -69,7 +69,8 @@ Keyclock
 - [x] Database initialization for tests
 - [ ] Split ApiControllers into service and controller 
 - [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
-- [ ] Migrate security from Basic to JWT
+- [x] Migrate security from Basic to JWT
+- [ ] Add /login to swagger UI
 
 ### Others
 

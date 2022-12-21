@@ -13,3 +13,5 @@ logging:
 
 springdoc:
   writer-with-order-by-keys: true
+
+secret: 52204fba4a1a8d9878edce08c52aaec00928d8f6e228a277f74abe9ce976b3dc3474f388a353009121d4f3b10f5d1b00015bf6410c50be06780307d61169dc8b

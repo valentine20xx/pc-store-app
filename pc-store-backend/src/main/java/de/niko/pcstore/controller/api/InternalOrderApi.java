@@ -65,6 +65,7 @@ public interface InternalOrderApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "401", description = ""),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error"),
     })

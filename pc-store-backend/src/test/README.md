@@ -13,4 +13,4 @@
 `curl "http://localhost:8080/download/internal-order-file/3fa49708-d0c6-4612-8f09-600d4412ee9c"`
 
 ### JWT auth
-curl -X POST http://localhost:8080/login -H "Content-Type: application/json" -d '{"username":"randomuser123","password":"password"}' -v
+curl -X POST http://localhost:8080/get-token -H "Content-Type: application/json" -d '{"password": "randomuser123","username": "password"}' -v

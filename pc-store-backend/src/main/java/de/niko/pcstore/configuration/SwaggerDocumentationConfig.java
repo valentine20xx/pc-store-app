@@ -15,7 +15,7 @@ public class SwaggerDocumentationConfig {
         GroupedOpenApi.Builder groupedOpenApi = GroupedOpenApi.builder();
         groupedOpenApi.group("pc-store");
         groupedOpenApi.displayName("PC Store API");
-        groupedOpenApi.  packagesToScan("de.niko.pcstore.controller.api");
+        groupedOpenApi.packagesToScan("de.niko.pcstore.controller.api");
 
         return groupedOpenApi.build();
     }

@@ -3,24 +3,21 @@ package de.niko.pcstore.configuration;
 import de.niko.pcstore.configuration.jwt.JwtAuthenticationEntryPoint;
 import de.niko.pcstore.configuration.jwt.JwtFilter;
 import de.niko.pcstore.configuration.jwt.JwtUserDetailsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
+@Slf4j
 @EnableWebSecurity
 public class SecurityConfig {
-    private static Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 
+    //    final Environment environment;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtUserDetailsService jwtUserDetailsService;
     private final JwtFilter filter;
@@ -31,27 +28,14 @@ public class SecurityConfig {
         this.filter = filter;
     }
 
-//    final Environment environment;
-//
-//    public SecurityConfig(Environment environment) {
-//        this.environment = environment;
-//    }
-
 //    @Bean
 //    public WebSecurityCustomizer webSecurityCustomizer() {
 //        return (web) -> web.ignoring().antMatchers("/swagger-ui/**");
 //    }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//        return NoOpPasswordEncoder.getInstance();
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(jwtUserDetailsService);
 
         return authenticationManagerBuilder.build();
@@ -67,23 +51,15 @@ public class SecurityConfig {
 //        var isProd = activeProfilesList.contains("prod");
 
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/login","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .authorizeRequests().antMatchers("/get-token", "/swagger-ui/**", "/v3/api-docs/**", "/api").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
-
-
-//        http
-//                .csrf().disable()
-//                .authorizeRequests().mvcMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll().and()
-//                .authorizeRequests().anyRequest().authenticated().and()
-//                .httpBasic();
-//
-//        return http.build();
 
 //        if (isLocal || activeProfilesList.size() == 0) {
 //            LOGGER.info("Local environment");

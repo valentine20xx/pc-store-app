@@ -18,4 +18,7 @@ public class JwtResponse implements Serializable {
     @JsonProperty
     @Schema(description = "JWT token", requiredMode = Schema.RequiredMode.REQUIRED)
     private String token;
+    @JsonProperty
+    @Schema(description = "Username", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String fullname;
 }

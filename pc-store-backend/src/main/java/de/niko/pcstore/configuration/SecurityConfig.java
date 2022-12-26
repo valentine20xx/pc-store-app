@@ -20,12 +20,12 @@ public class SecurityConfig {
     //    final Environment environment;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtUserDetailsService jwtUserDetailsService;
-    private final JwtFilter filter;
+    private final JwtFilter jwtFilter;
 
-    public SecurityConfig(JwtAuthenticationEntryPoint authenticationEntryPoint, JwtUserDetailsService jwtUserDetailsService, JwtFilter filter) {
+    public SecurityConfig(JwtAuthenticationEntryPoint authenticationEntryPoint, JwtUserDetailsService jwtUserDetailsService, JwtFilter jwtFilter) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtUserDetailsService = jwtUserDetailsService;
-        this.filter = filter;
+        this.jwtFilter = jwtFilter;
     }
 
 //    @Bean
@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 

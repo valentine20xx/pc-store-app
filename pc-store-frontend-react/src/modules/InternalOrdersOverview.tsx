@@ -5,10 +5,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import moment from "moment";
 import {NewInternalOrder} from "./internal-orders/new-internal-order/NewInternalOrder";
 import {InternalOrderShortDTO} from "../model/Model";
+import {decrement, increment} from "../state/counterSlice";
+import {useDispatch, useSelector} from 'react-redux'
+import {RootState} from "../state/store";
 
 export const InternalOrdersOverview = () => {
     const [rows, setRows] = React.useState<InternalOrderShortDTO[]>([]);
     const [open, setOpen] = React.useState(false);
+
+    const count = useSelector((state: RootState) => state.counter.value)
+    const dispatch = useDispatch()
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -57,6 +63,22 @@ export const InternalOrdersOverview = () => {
 
     return (
         <div className="internal-orders-overview">
+            <div>
+                <button
+                    aria-label="Increment value"
+                    onClick={() => dispatch(increment())}
+                >
+                    Increment
+                </button>
+                <span>{count}</span>
+                <button
+                    aria-label="Decrement value"
+                    onClick={() => dispatch(decrement())}
+                >
+                    Decrement
+                </button>
+            </div>
+
             <div style={{display: "flex", flexDirection: "row", gap: "1em"}}>
                 <Button variant="contained" onClick={handleClickOpen}>Create a new order</Button>
                 <Button variant="contained" color="info" onClick={() => {

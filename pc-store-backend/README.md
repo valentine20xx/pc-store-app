@@ -70,7 +70,8 @@ Keyclock
 - [ ] Split ApiControllers into service and controller 
 - [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
 - [x] Migrate security from Basic to JWT
-- [ ] Add /login to swagger UI
+- [x] Add /get-token to swagger UI
+- [ ] Migrate to Mapstruct https://mapstruct.org/
 
 ### Others
 

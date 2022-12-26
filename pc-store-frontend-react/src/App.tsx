@@ -1,8 +1,14 @@
 import React from "react";
 import "./App.css";
-import {AppBar, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography, useTheme} from "@mui/material";
+import {AppBar, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Toolbar, Typography, useTheme} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {Outlet, useNavigate} from "react-router-dom";
+import Button from '@mui/material/Button';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import PersonIcon from '@mui/icons-material/Person';
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "./state/store";
+import {clearAuthentication, setAuthentication} from "./state/userSlice";
 
 export const App = () => {
     const [state, setState] = React.useState({
@@ -25,6 +31,18 @@ export const App = () => {
         navigate("/internal-orders-overview");
     }
 
+    const user = useSelector((state: RootState) => state.user)
+    const dispatch = useDispatch()
+
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <div style={{display: "flex", flexDirection: "column", flexGrow: "1"}}>
             <AppBar position="static">
@@ -39,6 +57,40 @@ export const App = () => {
                     <Typography variant="h6" component="div" sx={{flexGrow: 1, textAlign: "center"}}>
                         PC Store
                     </Typography>
+                    {user.isAuthenticated ? <>
+                        <Button variant="contained" endIcon={<PersonIcon/>} onClick={event => {
+                            handleClick(event)
+                        }}>
+                            {user.fullname}
+                        </Button>
+                        <Menu
+                            id="demo-positioned-menu"
+                            aria-labelledby="demo-positioned-button"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                            }}
+                        >
+                            <MenuItem onClick={handleClose}>Profile</MenuItem>
+                            <MenuItem onClick={handleClose}>My account</MenuItem>
+                            <MenuItem onClick={event => {
+                                dispatch(clearAuthentication());
+                                handleClose();
+                            }}>Logout</MenuItem>
+                        </Menu>
+                    </> : <Button variant="contained" endIcon={<PersonOffIcon/>} onClick={event => {
+                        dispatch(setAuthentication({isAuthenticated: true, fullname: "Test Fullname", token: "TestToken"}));
+                    }}>
+                        Login
+                    </Button>
+                    }
                 </Toolbar>
             </AppBar>
             <div style={{display: "flex", flex: "1 1 100%"}}>

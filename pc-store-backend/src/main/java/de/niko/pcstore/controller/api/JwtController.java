@@ -1,6 +1,7 @@
 package de.niko.pcstore.controller.api;
 
 import de.niko.pcstore.configuration.Tags;
+import de.niko.pcstore.configuration.jwt.CustomUser;
 import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.JwtRequest;
 import de.niko.pcstore.configuration.jwt.JwtUserDetailsService;
@@ -58,17 +59,21 @@ public class JwtController {
 
             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         } catch (DisabledException e) {
-//            throw new Exception("USER_DISABLED", e);
-            ErrorDTO errorDTO = new ErrorDTO(401,"user disabled");
+            e.printStackTrace();
+            ErrorDTO errorDTO = new ErrorDTO(403, "user disabled");
             return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            e.printStackTrace();
+            ErrorDTO errorDTO = new ErrorDTO(403, "invalid credentials");
+            return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
         }
 //        final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        final CustomUser userDetails = (CustomUser) authentication.getPrincipal();
         final String jwtToken = tokenManager.generateJwtToken(userDetails);
 
-        JwtResponse jwtResponse = new JwtResponse(jwtToken);
+        JwtResponse jwtResponse = new JwtResponse();
+        jwtResponse.setToken(jwtToken);
+        jwtResponse.setFullname(userDetails.getFullname());
 
         return ResponseEntity.ok(jwtResponse);
     }

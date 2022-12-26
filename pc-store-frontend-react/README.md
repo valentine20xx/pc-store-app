@@ -7,6 +7,10 @@ Links:
 - https://react-hook-form.com/
 - https://github.com/iamhosseindhv/notistack
 - Moment: npm i moment
+- https://rxjs.dev
+- https://redux.js.org/introduction/getting-started
+- https://react-redux.js.org/
+- https://redux-toolkit.js.org/
 
 Commands:
 - npm outdated - get all outdated dependencies

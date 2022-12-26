@@ -6,36 +6,40 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {App} from "./App";
 import {InternalOrdersOverview} from "./modules/InternalOrdersOverview";
 import {SnackbarProvider} from "notistack";
+import {Provider} from 'react-redux'
+import {store} from "./state/store";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 
 root.render(
-    <BrowserRouter>
-        <Routes>
-            <Route path="/" element={
-                <SnackbarProvider maxSnack={7} autoHideDuration={null} anchorOrigin={{vertical: "top", horizontal: "right"}} preventDuplicate={true}>
-                    <App/>
-                </SnackbarProvider>
-            }>
-                <Route
-                    path="/internal-orders-overview"
-                    element={<InternalOrdersOverview/>}
-                />
-                <Route
-                    path="/"
-                    element={
-                        <div style={{display: "flex", flexDirection: "row", flex: "1 1 100%", placeContent: "center", alignItems: "center"}}>
-                            <div>
-                                <h1>Herzlich willkommen !</h1>
+    <Provider store={store}>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={
+                    <SnackbarProvider maxSnack={7} autoHideDuration={null} anchorOrigin={{vertical: "top", horizontal: "right"}} preventDuplicate={true}>
+                        <App/>
+                    </SnackbarProvider>
+                }>
+                    <Route
+                        path="/internal-orders-overview"
+                        element={<InternalOrdersOverview/>}
+                    />
+                    <Route
+                        path="/"
+                        element={
+                            <div style={{display: "flex", flexDirection: "row", flex: "1 1 100%", placeContent: "center", alignItems: "center"}}>
+                                <div>
+                                    <h1>Herzlich willkommen !</h1>
+                                </div>
                             </div>
-                        </div>
-                    }
-                />
-            </Route>
-        </Routes>
-    </BrowserRouter>
+                        }
+                    />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

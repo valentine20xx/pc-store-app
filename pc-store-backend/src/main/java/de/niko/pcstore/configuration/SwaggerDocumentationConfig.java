@@ -1,6 +1,7 @@
 package de.niko.pcstore.configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
@@ -37,7 +38,7 @@ public class SwaggerDocumentationConfig {
         info.license(license);
         info.contact(contact);
 
-        OpenAPI openAPI = new OpenAPI();
+        OpenAPI openAPI = new OpenAPI(SpecVersion.V31);
         openAPI.info(info);
 
         return openAPI;

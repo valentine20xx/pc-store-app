@@ -20,13 +20,17 @@
         <module>pc-store-backend</module>
     </modules>
 
+    <properties>
+            <spring-boot.version>2.7.7</spring-boot.version>
+    </properties>
+
     <dependencyManagement>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.7.6</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

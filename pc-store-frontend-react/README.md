@@ -12,6 +12,8 @@ Links:
 - https://react-redux.js.org/
 - https://redux-toolkit.js.org/
 
+- https://curity.io/resources/learn/jwt-best-practices/
+
 Commands:
 - npm outdated - get all outdated dependencies
 - npm update - update

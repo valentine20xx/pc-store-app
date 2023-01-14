@@ -2,6 +2,7 @@ package de.niko.pcstore.controller.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.InternalOrderDTO;
 import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
@@ -32,6 +33,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,28 +91,41 @@ public class InternalOrderApiController implements InternalOrderApi {
     }
 
     @Override
-    public ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(List<InternalOrderDTO.Status> statuses) {
-        List<InternalOrderEntity> internalOrderEntities;
+    public ResponseEntity<Object> getInternalOrderList(List<InternalOrderDTO.Status> statuses) {
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        var hasAuthority = authentication.getAuthorities().stream().anyMatch(grantedAuthority -> "ROLE_READ".equalsIgnoreCase(grantedAuthority.getAuthority()));
+//
+//        if (hasAuthority) {
 
-        if (statuses == null || statuses.size() == 0) {
-            internalOrderEntities = internalOrderRepository.findAll();
-        } else {
-            internalOrderEntities = internalOrderRepository.findAllWithStatuses(statuses.stream().map(status -> InternalOrderEntity.Status.fromString(status.getStatus())).toList());
-        }
+            List<InternalOrderEntity> internalOrderEntities;
 
-        var internalOrderDTOList = internalOrderEntities.stream().map(internalOrderEntity -> modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class)).toList();
+            if (statuses == null || statuses.size() == 0) {
+                internalOrderEntities = internalOrderRepository.findAll();
+            } else {
+                internalOrderEntities = internalOrderRepository.findAllWithStatuses(statuses.stream().map(status -> InternalOrderEntity.Status.fromString(status.getStatus())).toList());
+            }
 
-        return new ResponseEntity<>(internalOrderDTOList, HttpStatus.OK);
+            var internalOrderDTOList = internalOrderEntities.stream().map(internalOrderEntity -> modelMapper.map(internalOrderEntity, InternalOrderShortDTO.class)).toList();
+
+            return new ResponseEntity<>(internalOrderDTOList, HttpStatus.OK);
+//        } else {
+//            var errorDTO = new ErrorDTO();
+//            errorDTO.setCode(403);
+//            errorDTO.setMessage("Not enough authorities");
+//
+//            return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
+//        }
     }
 
     @Override
     public ResponseEntity<InternalOrderDTO> getInternalOrder(String id) {
         log.info(InternalOrderApiLogMessages.GET_INTERNAL_ORDER_INPUT, id);
-        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(id);
+        var internalOrderEntityOptional = internalOrderRepository.findById(id);
 
         if (internalOrderEntityOptional.isPresent()) {
-            InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
-            InternalOrderDTO internalOrderDTO = modelMapper.map(internalOrderEntity, InternalOrderDTO.class);
+            var internalOrderEntity = internalOrderEntityOptional.get();
+            var internalOrderDTO = modelMapper.map(internalOrderEntity, InternalOrderDTO.class);
 
             log.info(InternalOrderApiLogMessages.GET_INTERNAL_ORDER_OUTPUT, internalOrderDTO);
             return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
@@ -120,35 +136,59 @@ public class InternalOrderApiController implements InternalOrderApi {
     }
 
     @Override
-    public ResponseEntity<InternalOrderDTO> addInternalOrder(NewInternalOrderDTO newInternalOrderDTO) {
-        var internalOrderEntity = modelMapper.map(newInternalOrderDTO, InternalOrderEntity.class);
-        internalOrderEntity.setStatus(InternalOrderEntity.Status.OPEN);
-        internalOrderEntity.setDateOfReceiving(LocalDate.now());
+    public ResponseEntity<Object> addInternalOrder(NewInternalOrderDTO newInternalOrderDTO) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        var internalOrderSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
-        var internalOrderDTO = modelMapper.map(internalOrderSavedEntity, InternalOrderDTO.class);
+        var hasAuthority = authentication.getAuthorities().stream().anyMatch(grantedAuthority -> "ROLE_EDIT".equalsIgnoreCase(grantedAuthority.getAuthority()));
 
-        return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
+        if (hasAuthority) {
+            var internalOrderEntity = modelMapper.map(newInternalOrderDTO, InternalOrderEntity.class);
+            internalOrderEntity.setStatus(InternalOrderEntity.Status.OPEN);
+            internalOrderEntity.setDateOfReceiving(LocalDate.now());
+
+            var internalOrderSavedEntity = internalOrderRepository.saveAndFlush(internalOrderEntity);
+            var internalOrderDTO = modelMapper.map(internalOrderSavedEntity, InternalOrderDTO.class);
+
+            return new ResponseEntity<>(internalOrderDTO, HttpStatus.OK);
+        } else {
+            var errorDTO = new ErrorDTO();
+            errorDTO.setCode(403);
+            errorDTO.setMessage("Not enough authorities");
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
+        }
     }
 
     @Override
     public ResponseEntity<Object> updateInternalOrderStatus(String internalOrderId, InternalOrderDTO.Status status) {
-        Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(internalOrderId);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (internalOrderEntityOptional.isPresent()) {
-            InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+        boolean hasAuthority = authentication.getAuthorities().stream().anyMatch(grantedAuthority -> "ROLE_EDIT".equalsIgnoreCase(grantedAuthority.getAuthority()));
 
-            if (internalOrderEntity.getStatus() == InternalOrderEntity.Status.fromString(status.getStatus())) {
-                return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        if (hasAuthority) {
+            Optional<InternalOrderEntity> internalOrderEntityOptional = internalOrderRepository.findById(internalOrderId);
+
+            if (internalOrderEntityOptional.isPresent()) {
+                InternalOrderEntity internalOrderEntity = internalOrderEntityOptional.get();
+
+                if (internalOrderEntity.getStatus() == InternalOrderEntity.Status.fromString(status.getStatus())) {
+                    return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+                }
+
+                internalOrderEntity.setStatus(InternalOrderEntity.Status.fromString(status.getStatus()));
+
+                internalOrderRepository.saveAndFlush(internalOrderEntity);
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            internalOrderEntity.setStatus(InternalOrderEntity.Status.fromString(status.getStatus()));
-
-            internalOrderRepository.saveAndFlush(internalOrderEntity);
-
-            return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setCode(403);
+            errorDTO.setMessage("Not enough authorities");
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
         }
     }
 

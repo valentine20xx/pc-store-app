@@ -8,6 +8,7 @@ import de.niko.pcstore.dto.InternalOrderShortDTO;
 import de.niko.pcstore.dto.NewInternalOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +40,12 @@ public interface InternalOrderApi {
 
     @Operation(summary = "Delete a internal order")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "item deleted"),
-            @ApiResponse(responseCode = "404", description = "an item is already deleted"),
-            @ApiResponse(responseCode = "409", description = "an item is not deletable")
+            @ApiResponse(responseCode = "200", description = "item deleted", content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "304", description = "an item is already deleted", content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "an item is not deletable or already deleted", content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = DELETE_INTERNAL_ORDER,
             method = RequestMethod.DELETE)
@@ -49,25 +54,31 @@ public interface InternalOrderApi {
             @PathVariable("id")
             String id);
 
+    @PreAuthorize("hasRole(\"READ\")")
     @Operation(summary = "Get all internal orders")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "All internal orders"),
+            @ApiResponse(responseCode = "200", description = "All internal orders", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InternalOrderShortDTO.class)))),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(
+    ResponseEntity<Object> getInternalOrderList(
             @RequestParam(required = false)
             @Parameter(description = "Statuses of the internal order")
             List<InternalOrderDTO.Status> statuses);
 
     @Operation(summary = "Get one specific internal order")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
-            @ApiResponse(responseCode = "401", description = ""),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InternalOrderDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = GET_INTERNAL_ORDER,
             produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -79,15 +90,17 @@ public interface InternalOrderApi {
 
     @Operation(summary = "Add a new internal order")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "Bad input parameter"),
-            @ApiResponse(responseCode = "500", description = "Internal server error"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InternalOrderDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad input parameter", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = ADD_INTERNAL_ORDER,
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.POST)
-    ResponseEntity<InternalOrderDTO> addInternalOrder(
+    ResponseEntity<Object> addInternalOrder(
             @Parameter(description = "Object to add")
             @RequestBody
             NewInternalOrderDTO internalOrderDTO);
@@ -98,6 +111,8 @@ public interface InternalOrderApi {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad input parameter"),
             @ApiResponse(responseCode = "304", description = "Status already set"),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = UPDATE_INTERNAL_ORDER_STATUS,
@@ -114,12 +129,14 @@ public interface InternalOrderApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad input parameter"),
+            @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @RequestMapping(value = GET_INTERNAL_ORDER_PERSONAL_COMPUTER,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
     ResponseEntity<InternalOrderDTO.PersonalComputerDTO> getPersonalComputerConfigurationByOrderId(@Parameter(description = "Id of the internal order", required = true)
-                                                                                              @PathVariable("id")
-                                                                                              String id);
+                                                                                                   @PathVariable("id")
+                                                                                                   String id);
 }

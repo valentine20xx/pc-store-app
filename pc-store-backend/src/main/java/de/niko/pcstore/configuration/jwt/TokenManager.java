@@ -5,13 +5,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.Serializable;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.crypto.KeyGenerator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class TokenManager implements Serializable {
     public static final long TOKEN_VALIDITY = 2 * 60 * 60;
@@ -22,6 +27,7 @@ public class TokenManager implements Serializable {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(SignatureAlgorithm.HS512.getJcaName());
             keyGenerator.init(512);
             this.key = keyGenerator.generateKey();
+            log.debug("Generated key: " + Base64.getEncoder().encodeToString((this.key.getEncoded())));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,8 +43,10 @@ public class TokenManager implements Serializable {
      * @param userDetails
      * @return
      */
-    public String generateJwtToken(UserDetails userDetails) {
+    public String generateJwtToken(CustomUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        claims.put("fullname", userDetails.getFullName());
 
         return Jwts.builder()
                 .setClaims(claims)

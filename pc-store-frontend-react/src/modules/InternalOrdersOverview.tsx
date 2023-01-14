@@ -1,21 +1,21 @@
 import React from "react";
-import {Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow} from "@mui/material";
+import {Box, Button, Fab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme} from "@mui/material";
 import "./InternalOrdersOverview.css";
 import EditIcon from "@mui/icons-material/Edit";
 import moment from "moment";
 import {NewInternalOrder} from "./internal-orders/new-internal-order/NewInternalOrder";
 import {InternalOrderShortDTO} from "../model/Model";
-import {decrement, increment} from "../state/counterSlice";
-import {useDispatch, useSelector} from 'react-redux'
+import {useSelector} from "react-redux";
 import {RootState} from "../state/store";
+import {ajax} from "rxjs/internal/ajax/ajax";
+import {ROLES} from "../state/userSlice";
 
 export const InternalOrdersOverview = () => {
     const [rows, setRows] = React.useState<InternalOrderShortDTO[]>([]);
     const [open, setOpen] = React.useState(false);
 
-    const count = useSelector((state: RootState) => state.counter.value)
-    const dispatch = useDispatch()
-
+    const user = useSelector((state: RootState) => state.user);
+    const theme = useTheme();
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -28,21 +28,19 @@ export const InternalOrdersOverview = () => {
     };
 
     const loadOrderList = (): void => {
-        fetch("http://localhost:8080/internal-order-list")
-            .then(value => {
-                return value.json();
+        if (user.isAuthenticated) {
+            ajax.get<Array<InternalOrderShortDTO>>("/internal-order-list", {
+                "Authorization": `Bearer ${user.token}`
+            }).subscribe(value => {
+                console.log(value)
+                const objs = value.response.map(value => {
+                    return {...value, dateOfReceiving: moment(value.dateOfReceiving, "yyyy-MM-dd").toDate()}
+                })
+                setRows(objs);
+            }, error => {
+                console.error(error);
             })
-            .then(
-                (result) => {
-                    const objs = (result as InternalOrderShortDTO[]).map(value => {
-                        return {...value, dateOfReceiving: moment(value.dateOfReceiving, "yyyy-MM-dd").toDate()}
-                    })
-                    setRows(objs);
-                },
-                (error) => {
-                    console.error(error);
-                }
-            )
+        }
     }
 
     React.useEffect(() => {
@@ -62,29 +60,14 @@ export const InternalOrdersOverview = () => {
     };
 
     return (
-        <div className="internal-orders-overview">
-            <div>
-                <button
-                    aria-label="Increment value"
-                    onClick={() => dispatch(increment())}
-                >
-                    Increment
-                </button>
-                <span>{count}</span>
-                <button
-                    aria-label="Decrement value"
-                    onClick={() => dispatch(decrement())}
-                >
-                    Decrement
-                </button>
-            </div>
+        <Box className="internal-orders-overview">
 
-            <div style={{display: "flex", flexDirection: "row", gap: "1em"}}>
-                <Button variant="contained" onClick={handleClickOpen}>Create a new order</Button>
+            <Box style={{display: "flex", flexDirection: "row", gap: "1em"}}>
+                <Button variant="contained" onClick={handleClickOpen} disabled={!user.isAuthenticated || !user.roles.includes(ROLES.EDIT)}>Create a new order</Button>
                 <Button variant="contained" color="info" onClick={() => {
                     loadOrderList();
-                }}>Refresh</Button>
-            </div>
+                }} disabled={!user.isAuthenticated || !user.roles.includes(ROLES.READ)}>Refresh</Button>
+            </Box>
 
             <NewInternalOrder open={open} handleClose={handleClose}/>
 
@@ -100,21 +83,34 @@ export const InternalOrdersOverview = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row) => (
-                                <TableRow key={row.id}>
-                                    <TableCell align="left" style={{width: "35%"}}>{row.client}</TableCell>
-                                    <TableCell align="left" style={{width: "35%"}}>{row.personalComputer}</TableCell>
-                                    <TableCell align="left" style={{width: "15%"}}>{row.status}</TableCell>
-                                    <TableCell align="left" style={{width: "15%"}}>{row.dateOfReceiving.toLocaleDateString()}</TableCell>
-                                    <TableCell align="right" style={{width: "0"}}>
-                                        <Fab color="primary" size="small">
-                                            <EditIcon/>
-                                        </Fab>
+                        {user.isAuthenticated ?
+                            user.roles.includes(ROLES.READ) ?
+                                rows
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row) => (
+                                        <TableRow key={row.id}>
+                                            <TableCell align="left" style={{width: "35%"}}>{row.client}</TableCell>
+                                            <TableCell align="left" style={{width: "35%"}}>{row.personalComputer}</TableCell>
+                                            <TableCell align="left" style={{width: "15%"}}>{row.status}</TableCell>
+                                            <TableCell align="left" style={{width: "15%"}}>{row.dateOfReceiving.toLocaleDateString()}</TableCell>
+                                            <TableCell align="right" style={{width: "0"}}>
+                                                <Fab color="primary" size="small">
+                                                    <EditIcon/>
+                                                </Fab>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                :
+                                <TableRow>
+                                    <TableCell align="center" colSpan={5}>
+                                        <Typography variant="h5">The user does not have a permission</Typography>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            : <TableRow>
+                                <TableCell align="center" colSpan={5}>
+                                    <Typography variant="h5">No authentication</Typography>
+                                </TableCell>
+                            </TableRow>}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -128,15 +124,6 @@ export const InternalOrdersOverview = () => {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
-        </div>
+        </Box>
     );
-}
-
-export function generateId() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c: string) => {
-        const r = Math.random() * 16 | 0;
-        // eslint-disable-next-line no-mixed-operators
-        const v = c === "x" ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
 }

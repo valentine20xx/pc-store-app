@@ -63,15 +63,15 @@ Keyclock
 ### TODO list
 
 - [x] One-request creation.
-- [ ] CRON work for archiving.
-- [ ] Swagger: ordering in json objects order.
-- [x] Add client data
-- [x] Database initialization for tests
-- [ ] Split ApiControllers into service and controller 
+- [x] Add client data.
 - [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
 - [x] Migrate security from Basic to JWT
 - [x] Add /get-token to swagger UI
+- [ ] CRON work for archiving.
+- [ ] Swagger: ordering in json objects order.
+- [ ] Split ApiControllers into service and controller 
 - [ ] Migrate to Mapstruct https://mapstruct.org/
+- [ ] Migrate to Spring Boot 3
 
 ### Others
 

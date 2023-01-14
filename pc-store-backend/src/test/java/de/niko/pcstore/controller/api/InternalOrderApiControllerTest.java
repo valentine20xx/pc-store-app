@@ -17,23 +17,26 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.Invocation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
-@AutoConfigureTestEntityManager
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("Test InternalOrderApiController")
@@ -62,13 +65,17 @@ public class InternalOrderApiControllerTest {
 
         Mockito.when(internalOrderRepository.findAll()).thenReturn(Arrays.asList(internalOrderEntity1, internalOrderEntity2));
 
-        ResponseEntity<List<InternalOrderShortDTO>> internalOrderList = internalOrderApiController.getInternalOrderList(Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(null, null, AuthorityUtils.createAuthorityList("ROLE_READ", "ROLE_EDIT")));
+
+        ResponseEntity<Object> internalOrderListResponseEntity = internalOrderApiController.getInternalOrderList(Collections.emptyList());
+
+        Assertions.assertNotNull(internalOrderListResponseEntity);
+        Assertions.assertEquals(HttpStatus.OK, internalOrderListResponseEntity.getStatusCode());
+
+        List<InternalOrderShortDTO> internalOrderList = (List<InternalOrderShortDTO>) internalOrderListResponseEntity.getBody();
 
         Assertions.assertNotNull(internalOrderList);
-        Assertions.assertEquals(HttpStatus.OK, internalOrderList.getStatusCode());
-
-        Assertions.assertNotNull(internalOrderList.getBody());
-        Assertions.assertEquals(2, internalOrderList.getBody().size());
+        Assertions.assertEquals(2, internalOrderList.size());
     }
 
     @Test

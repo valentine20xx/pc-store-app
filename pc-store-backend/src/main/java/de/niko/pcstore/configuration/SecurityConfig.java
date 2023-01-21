@@ -4,12 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.niko.pcstore.configuration.jwt.JwtAuthenticationEntryPoint;
 import de.niko.pcstore.configuration.jwt.JwtFilter;
 import de.niko.pcstore.configuration.jwt.JwtUserDetailsService;
+import de.niko.pcstore.controller.api.InternalOrderApi;
 import de.niko.pcstore.dto.ErrorDTO;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,13 +26,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
 @EnableWebSecurity
 public class SecurityConfig {
-
-    //    final Environment environment;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtUserDetailsService jwtUserDetailsService;
     private final JwtFilter jwtFilter;
@@ -46,15 +53,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        var activeProfiles = environment.getActiveProfiles();
-//        var activeProfilesList = Arrays.asList(activeProfiles);
-//
-//        var isLocal = activeProfilesList.contains("local");
-//        var isDev = activeProfilesList.contains("dev");
-//        var isProd = activeProfilesList.contains("prod");
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
 
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/get-token", "/swagger-ui/**", "/v3/api-docs/**", "/api").permitAll()
+                .authorizeRequests()
+                .expressionHandler(expressionHandler)
+                .antMatchers("/get-token", "/swagger-ui/**", "/v3/api-docs/**", "/api").permitAll()
+                .mvcMatchers(InternalOrderApi.GET_INTERNAL_ORDER_LIST, InternalOrderApi.GET_INTERNAL_ORDER, InternalOrderApi.GET_INTERNAL_ORDER_PERSONAL_COMPUTER).hasRole("READ")
+                .mvcMatchers(InternalOrderApi.ADD_INTERNAL_ORDER, InternalOrderApi.UPDATE_INTERNAL_ORDER_STATUS, InternalOrderApi.DELETE_INTERNAL_ORDER).hasRole("EDIT")
                 .anyRequest().authenticated()
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -69,7 +76,7 @@ public class SecurityConfig {
                     errorDTO.setCode(HttpServletResponse.SC_FORBIDDEN);
                     errorDTO.setMessage("Not enough authorities");
 
-                   String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
+                    String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
 
                     response.getWriter().write(errorDTOAsJsonObject);
                 }).authenticationEntryPoint(authenticationEntryPoint)
@@ -77,34 +84,16 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
 
-//        if (isLocal || activeProfilesList.size() == 0) {
-//            LOGGER.info("Local environment");
-////            http.authorizeRequests().antMatchers("/**").permitAll();
-//
-////            http.authorizeRequests()
-////                    .antMatchers("/swagger-ui/**").permitAll()
-////
-////                    .and()
-////                    .authorizeRequests()
-////                   .antMatchers("/internal**").authenticated()
-//////
-//////                    .hasRole("SWAGGER")
-//////
-////                    .and()
-////                    .httpBasic();
-//
-////            http
-////                    .authorizeRequests().antMatchers("/internal-order/**").hasRole("SWAGGER").and().httpBasic();
-//
-//        } else if (isDev) {
-//            LOGGER.info("Development environment");
-//            http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
-////            No auth
-//        } else if (isProd) {
-//            LOGGER.info("Production environment");
-//        }
-//
-//        return http.build();
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+
+        Map<String, List<String>> roleHierarchyMap = new HashMap<>();
+        roleHierarchyMap.put("ROLE_EDIT", Arrays.asList("ROLE_READ"));
+
+        roleHierarchy.setHierarchy(RoleHierarchyUtils.roleHierarchyFromMap(roleHierarchyMap));
+        return roleHierarchy;
     }
 }

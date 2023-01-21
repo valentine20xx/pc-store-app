@@ -64,19 +64,22 @@ Keyclock
 
 - [x] One-request creation.
 - [x] Add client data.
-- [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html)
-- [x] Migrate security from Basic to JWT
-- [x] Add /get-token to swagger UI
+- [x] Swagger generation migrate from SpringFox (https://springdoc.org/migrating-from-springfox.html).
+- [x] Migrate security from Basic to JWT.
+- [x] Add /get-token to swagger UI.
+- [x] Role hierarchy.
 - [ ] CRON work for archiving.
 - [ ] Swagger: ordering in json objects order.
-- [ ] Split ApiControllers into service and controller 
-- [ ] Migrate to Mapstruct https://mapstruct.org/
-- [ ] Migrate to Spring Boot 3
+- [ ] Split ApiControllers into service and controller.
+- [ ] Migrate to Mapstruct https://mapstruct.org/.
+- [ ] Migrate to Spring Boot 3.
+  - Springdoc for Spring Boot 3: https://springdoc.org/v2/.
 
 ### Others
 
-debug request-response communication : `-Djavax.net.debug=ssl`
-`mvn dependency:tree`
+- debug request-response communication : `-Djavax.net.debug=ssl`
+- `mvn dependency:tree`
+- `git config core.editor notepad`
 
 ###### Links:
 - https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter

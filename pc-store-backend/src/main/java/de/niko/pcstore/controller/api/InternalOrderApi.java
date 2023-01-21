@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +53,6 @@ public interface InternalOrderApi {
             @PathVariable("id")
             String id);
 
-    @PreAuthorize("hasRole(\"READ\")")
     @Operation(summary = "Get all internal orders")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "All internal orders", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InternalOrderShortDTO.class)))),
@@ -66,7 +64,7 @@ public interface InternalOrderApi {
     @RequestMapping(value = GET_INTERNAL_ORDER_LIST,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.GET)
-    ResponseEntity<Object> getInternalOrderList(
+    ResponseEntity<List<InternalOrderShortDTO>> getInternalOrderList(
             @RequestParam(required = false)
             @Parameter(description = "Statuses of the internal order")
             List<InternalOrderDTO.Status> statuses);
@@ -100,11 +98,10 @@ public interface InternalOrderApi {
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.POST)
-    ResponseEntity<Object> addInternalOrder(
+    ResponseEntity<InternalOrderDTO> addInternalOrder(
             @Parameter(description = "Object to add")
             @RequestBody
             NewInternalOrderDTO internalOrderDTO);
-
 
     @Operation(summary = "Update status of internal order")
     @ApiResponses({
@@ -127,7 +124,7 @@ public interface InternalOrderApi {
 
     @Operation(summary = "Get personal computer configuration of an internal order")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InternalOrderDTO.PersonalComputerDTO.class))),
             @ApiResponse(responseCode = "400", description = "Bad input parameter"),
             @ApiResponse(responseCode = "401", description = "Wrong authentication token", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "403", description = "Lack of authority", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),

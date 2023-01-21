@@ -27,7 +27,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         } else if ("username2".equals(username)) {
             foundUser = new CustomUser("username2", passwordEncoder().encode("password"), AuthorityUtils.createAuthorityList("ROLE_READ"), "User name two");
         } else if ("username3".equals(username)) {
-            foundUser = new CustomUser("username3", passwordEncoder().encode("password"), AuthorityUtils.createAuthorityList("ROLE_READ", "ROLE_EDIT"), "User name three");
+            foundUser = new CustomUser("username3", passwordEncoder().encode("password"), AuthorityUtils.createAuthorityList("ROLE_EDIT"), "User name three");
         }
 
         if (foundUser != null) {

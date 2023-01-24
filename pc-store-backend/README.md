@@ -72,6 +72,7 @@ Keyclock
 - [ ] Swagger: ordering in json objects order.
 - [ ] Split ApiControllers into service and controller.
 - [ ] Migrate to Mapstruct https://mapstruct.org/.
+- [ ] Integrate OAuth2 security (Keycloak)
 - [ ] Migrate to Spring Boot 3.
   - Springdoc for Spring Boot 3: https://springdoc.org/v2/.
 

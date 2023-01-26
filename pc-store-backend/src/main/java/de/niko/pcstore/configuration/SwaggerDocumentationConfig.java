@@ -1,5 +1,6 @@
 package de.niko.pcstore.configuration;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Contact;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerDocumentationConfig {
     @Bean
-    public GroupedOpenApi publicApi() {
+    public GroupedOpenApi groupedOpenApi() {
         GroupedOpenApi.Builder groupedOpenApi = GroupedOpenApi.builder();
         groupedOpenApi.group("pc-store");
         groupedOpenApi.displayName("PC Store API");
@@ -22,7 +23,7 @@ public class SwaggerDocumentationConfig {
     }
 
     @Bean
-    public OpenAPI springShopOpenAPI() {
+    public OpenAPI openAPI() {
         Contact contact = new Contact();
         contact.setName("Niko");
         contact.setEmail("example@test.de");

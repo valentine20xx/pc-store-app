@@ -2,7 +2,6 @@ package de.niko.pcstore.controller.api;
 
 import de.niko.pcstore.configuration.Tags;
 import de.niko.pcstore.configuration.jwt.CustomUser;
-import de.niko.pcstore.configuration.jwt.JwtUserDetailsService;
 import de.niko.pcstore.configuration.jwt.TokenManager;
 import de.niko.pcstore.dto.ErrorDTO;
 import de.niko.pcstore.dto.JwtRequest;
@@ -20,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

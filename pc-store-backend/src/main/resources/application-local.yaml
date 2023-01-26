@@ -25,11 +25,7 @@ spring:
   config:
     activate:
       on-profile: local
-  security:
-    user:
-      name: user1
-      password: user1
-      roles: SWAGGER
+
 #  security:
 #    oauth2:
 #      client:

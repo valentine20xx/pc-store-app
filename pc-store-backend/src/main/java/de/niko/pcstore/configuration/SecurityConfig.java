@@ -13,34 +13,47 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyUtils;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @Slf4j
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtUserDetailsService jwtUserDetailsService;
-    private final JwtFilter jwtFilter;
+//    private final JwtFilter jwtFilter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SecurityConfig(JwtAuthenticationEntryPoint authenticationEntryPoint, JwtUserDetailsService jwtUserDetailsService, JwtFilter jwtFilter) {
+    public SecurityConfig(JwtAuthenticationEntryPoint authenticationEntryPoint, JwtUserDetailsService jwtUserDetailsService
+//            , JwtFilter jwtFilter
+    ) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtUserDetailsService = jwtUserDetailsService;
-        this.jwtFilter = jwtFilter;
+//        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -52,11 +65,16 @@ public class SecurityConfig {
     }
 
     @Bean
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
 
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .expressionHandler(expressionHandler)
                 .antMatchers("/get-token", "/swagger-ui/**", "/v3/api-docs/**", "/api").permitAll()
@@ -79,12 +97,36 @@ public class SecurityConfig {
                     String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
 
                     response.getWriter().write(errorDTOAsJsonObject);
-                }).authenticationEntryPoint(authenticationEntryPoint)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                })
+//                .authenticationEntryPoint(authenticationEntryPoint)
+//                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//                .and().oauth2Client()
+
+                .and() .oauth2Login()
+
+                .and().oauth2ResourceServer(
+                        oauth2ResourceServer -> oauth2ResourceServer.jwt(
+                                jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                );
+
+//        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+    private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
+        return jwtConverter;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withJwkSetUri(this.jwkSetUri).build();
+    }
+
+    String jwkSetUri = "http://localhost:8180/realms/master/protocol/openid-connect/certs";
 
     @Bean
     public RoleHierarchy roleHierarchy() {

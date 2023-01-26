@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
-@Component
+//@Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUserDetailsService userDetailsService;
     private final TokenManager tokenManager;

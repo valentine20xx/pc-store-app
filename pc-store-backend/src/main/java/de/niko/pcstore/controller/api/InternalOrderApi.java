@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = Tags.INTERNAL_ORDER_API_TAG)
-@SecurityRequirement(name = "test-jwt")
+@SecurityRequirement(name = Tags.SECURITY_SCHEME_NAME)
 public interface InternalOrderApi {
-    String GET_INTERNAL_ORDER_LIST = "/internal-order-list";
+    String GET_INTERNAL_ORDER_LIST = "/internal-order";
     String GET_INTERNAL_ORDER = "/internal-order/{id}";
     // TODO:
     String GET_INTERNAL_ORDER_CLIENT_DATA = "/internal-order/{id}/client-data";

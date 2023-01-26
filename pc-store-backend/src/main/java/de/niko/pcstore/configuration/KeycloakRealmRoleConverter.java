@@ -16,11 +16,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
-
-        log.info("realm_access: " + realmAccess);
-
         final Map<String, Object> resource_access = jwt.getClaimAsMap("resource_access");
+
+        log.info("resource_access: " + resource_access);
 
         final Map<String, Object> testClient = (Map<String, Object>) resource_access.get("test-client");
 

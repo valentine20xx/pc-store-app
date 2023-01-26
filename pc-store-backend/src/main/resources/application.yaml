@@ -8,7 +8,7 @@ spring:
         registration:
           keycloak:
             client-id: test-client
-            client-secret: fwZ1Wjq9sJWRADy7TiVuipUo1pGEHTce
+            client-secret: lt1SGTpv9BRMaV4gYeJeep1I7rtHWEG9
             clientName: Keycloak
             authorization-grant-type: authorization_code
             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'

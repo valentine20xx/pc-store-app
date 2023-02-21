@@ -68,11 +68,13 @@ Keyclock
 - [x] Migrate security from Basic to JWT.
 - [x] Add /get-token to swagger UI.
 - [x] Role hierarchy.
+- [x] Integrate OAuth2 security (Keycloak)
+  - [ ] Logout and token invalidate
+  - [ ] Redirect (Code + redirect url) if not authenticated (https://www.predic8.de/oauth2-beispiel.htm 2)
 - [ ] CRON work for archiving.
 - [ ] Swagger: ordering in json objects order.
 - [ ] Split ApiControllers into service and controller.
 - [ ] Migrate to Mapstruct https://mapstruct.org/.
-- [ ] Integrate OAuth2 security (Keycloak)
 - [ ] Migrate to Spring Boot 3.
   - Springdoc for Spring Boot 3: https://springdoc.org/v2/.
 

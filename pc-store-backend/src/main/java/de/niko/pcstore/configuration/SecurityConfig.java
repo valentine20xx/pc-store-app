@@ -1,7 +1,6 @@
 package de.niko.pcstore.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.niko.pcstore.controller.api.InternalOrderApi;
 import de.niko.pcstore.dto.ErrorDTO;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,27 +9,27 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyUtils;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrations;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -40,9 +39,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @EnableWebSecurity
 public class SecurityConfig {
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public SecurityConfig() {
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
@@ -66,22 +62,15 @@ public class SecurityConfig {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
 
-        http.csrf().disable()
+        return http.csrf().disable()
+                .formLogin().disable()
                 .authorizeRequests()
                 .expressionHandler(expressionHandler)
-                .antMatchers("/get-token", "/swagger-ui/**", "/v3/api-docs/**", "/api").permitAll()
-                .antMatchers(HttpMethod.POST,"/internal-order/**").hasRole("EDIT")
-                .antMatchers(HttpMethod.DELETE,"/internal-order/**").hasRole("EDIT")
+                .antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api", "/favicon.ico").permitAll()
+                .antMatchers(HttpMethod.POST, "/internal-order/**").hasRole("EDIT")
+                .antMatchers(HttpMethod.DELETE, "/internal-order/**").hasRole("EDIT")
                 .antMatchers(HttpMethod.GET, "/internal-order/update-status").hasRole("EDIT")
-
                 .antMatchers(HttpMethod.GET, "/internal-order/**").hasRole("READ")
-//                .mvcMatchers(HttpMethod.GET, InternalOrderApi.GET_INTERNAL_ORDER_LIST,
-//                        InternalOrderApi.GET_INTERNAL_ORDER,
-//                        InternalOrderApi.GET_INTERNAL_ORDER_PERSONAL_COMPUTER).hasRole("READ")
-//
-//                .mvcMatchers(HttpMethod.POST, InternalOrderApi.ADD_INTERNAL_ORDER).hasRole("EDIT")
-//                .mvcMatchers(HttpMethod.GET, InternalOrderApi.UPDATE_INTERNAL_ORDER_STATUS).hasRole("EDIT")
-//                .mvcMatchers(HttpMethod.DELETE, InternalOrderApi.DELETE_INTERNAL_ORDER).hasRole("EDIT")
                 .anyRequest().denyAll()
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -99,32 +88,16 @@ public class SecurityConfig {
                     String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
 
                     response.getWriter().write(errorDTOAsJsonObject);
-                })
-//                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().oauth2Login()
-                .and().oauth2ResourceServer(
-                        oauth2ResourceServer -> oauth2ResourceServer.jwt(
-                                jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                );
-
-//        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
-        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-        jwtConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
-        return jwtConverter;
+                }).and().logout().logoutUrl("http://localhost:8180/realms/master/protocol/openid-connect/logout")
+                .and().oauth2ResourceServer(new PCStoreOAuth2ResourceServerCustomizer()).build();
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri(this.jwkSetUri).build();
-    }
+        String jwkSetUri = "http://localhost:8180/realms/master/protocol/openid-connect/certs";
 
-    String jwkSetUri = "http://localhost:8180/realms/master/protocol/openid-connect/certs";
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+    }
 
     @Bean
     public RoleHierarchy roleHierarchy() {

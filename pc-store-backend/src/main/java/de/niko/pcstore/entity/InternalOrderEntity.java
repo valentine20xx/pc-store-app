@@ -49,6 +49,9 @@ public class InternalOrderEntity extends DefaultPersistenceObject {
     private Boolean privacyPolicy;
 
     @Column
+    private String createdBy;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private Status status;
 

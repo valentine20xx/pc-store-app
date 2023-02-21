@@ -6,12 +6,16 @@ import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerDocumentationConfig {
+
     @Bean
     public GroupedOpenApi groupedOpenApi() {
         GroupedOpenApi.Builder groupedOpenApi = GroupedOpenApi.builder();
@@ -41,6 +45,22 @@ public class SwaggerDocumentationConfig {
 
         OpenAPI openAPI = new OpenAPI(SpecVersion.V31);
         openAPI.info(info);
+
+        Components components = new Components();
+        SecurityScheme securityScheme = new SecurityScheme();
+        securityScheme.setName(Tags.SECURITY_SCHEME_NAME);
+        securityScheme.setScheme("bearer");
+        securityScheme.setBearerFormat("JWT");
+        securityScheme.setType(SecurityScheme.Type.OAUTH2);
+        securityScheme.setIn(SecurityScheme.In.HEADER);
+        OAuthFlows oAuthFlows = new OAuthFlows();
+        OAuthFlow oAuthFlow = new OAuthFlow();
+        oAuthFlow.setTokenUrl("http://localhost:8180/realms/master/protocol/openid-connect/token");
+        oAuthFlow.setAuthorizationUrl(" http://localhost:8180/realms/master/protocol/openid-connect/auth");
+        oAuthFlows.setAuthorizationCode(oAuthFlow);
+        securityScheme.setFlows(oAuthFlows);
+        components.addSecuritySchemes(Tags.SECURITY_SCHEME_NAME, securityScheme);
+        openAPI.setComponents(components);
 
         return openAPI;
     }

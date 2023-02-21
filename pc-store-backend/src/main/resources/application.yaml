@@ -2,44 +2,6 @@ spring:
   profiles:
     active: prod
 
-  security:
-    oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: test-client
-            client-secret: lt1SGTpv9BRMaV4gYeJeep1I7rtHWEG9
-            clientName: Keycloak
-            authorization-grant-type: authorization_code
-            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          keycloak:
-            authorization-uri:  http://localhost:8180/realms/master/protocol/openid-connect/auth
-            token-uri: http://localhost:8180/realms/master/protocol/openid-connect/token
-            user-info-uri: http://localhost:8180/realms/master/protocol/openid-connect/userinfo
-            jwk-set-uri: http://localhost:8180/realms/master/protocol/openid-connect/certs
-            user-name-attribute: preferred_username
-
-#        registration:
-#          keycloak:
-#            provider: keycloak
-#            client-id: login-app
-#            authorization-grant-type: authorization_code
-#            scope: openid
-#      provider:
-#        keycloak:
-#          issuer-uri: http://localhost:8180/realms/master
-#          user-name-attribute: preferred_username
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri : http://localhost:8180/realms/springboot
-
 logging:
   file:
     name: logs/logfile.log

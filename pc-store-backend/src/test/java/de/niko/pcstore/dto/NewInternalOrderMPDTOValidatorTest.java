@@ -20,7 +20,7 @@ public class NewInternalOrderMPDTOValidatorTest {
     private MessageCodesResolver myMessageCodesResolver;
 
     @BeforeEach
-    private void initCheck() {
+    public void initCheck() {
         Assertions.assertThat(myMessageCodesResolver).isNotNull();
     }
 

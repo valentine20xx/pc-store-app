@@ -2,11 +2,11 @@ package de.niko.pcstore.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.niko.pcstore.dto.ErrorDTO;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -23,11 +23,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ClientRegistrations;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -54,23 +49,24 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.debug(true);
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+
+        return (web) -> web.debug(true).expressionHandler(expressionHandler);
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy());
+
 
         return http.csrf().disable()
                 .formLogin().disable()
-                .authorizeRequests()
-                .expressionHandler(expressionHandler)
-                .antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api", "/favicon.ico").permitAll()
-                .antMatchers(HttpMethod.POST, "/internal-order/**").hasRole("EDIT")
-                .antMatchers(HttpMethod.DELETE, "/internal-order/**").hasRole("EDIT")
-                .antMatchers(HttpMethod.GET, "/internal-order/update-status").hasRole("EDIT")
-                .antMatchers(HttpMethod.GET, "/internal-order/**").hasRole("READ")
+                .authorizeHttpRequests()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api", "/favicon.ico").permitAll()
+                .requestMatchers(HttpMethod.POST, "/internal-order/**").hasRole("EDIT")
+                .requestMatchers(HttpMethod.DELETE, "/internal-order/**").hasRole("EDIT")
+                .requestMatchers(HttpMethod.GET, "/internal-order/update-status").hasRole("EDIT")
+                .requestMatchers(HttpMethod.GET, "/internal-order/**").hasRole("READ")
                 .anyRequest().denyAll()
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -99,7 +95,7 @@ public class SecurityConfig {
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 
-    @Bean
+//    @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 

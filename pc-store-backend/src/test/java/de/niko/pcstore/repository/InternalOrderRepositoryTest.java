@@ -93,7 +93,7 @@ public class InternalOrderRepositoryTest {
 
 
     @BeforeEach
-    private void initializeDatabase() {
+    public void initializeDatabase() {
         Assertions.assertNotNull(internalOrderRepository);
     }
 }

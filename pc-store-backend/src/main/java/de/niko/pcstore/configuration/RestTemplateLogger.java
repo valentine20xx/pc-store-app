@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -27,13 +28,13 @@ public class RestTemplateLogger implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] requestBodyBytes, ClientHttpRequestExecution execution) throws IOException {
         HttpHeaders requestHeaders = request.getHeaders();
-        String requestMethod = request.getMethodValue();
+        String requestMethod = request.getMethod().name();
         URI requestURI = request.getURI();
         String requestBody = new String(requestBodyBytes, Charset.defaultCharset());
 
         ClientHttpResponse response = execution.execute(request, requestBodyBytes);
 
-        HttpStatus responseStatusCode = response.getStatusCode();
+        HttpStatusCode responseStatusCode = response.getStatusCode();
         String responseStatusText = response.getStatusText();
         HttpHeaders responseHeaders = response.getHeaders();
         InputStream responseBody = response.getBody();

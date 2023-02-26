@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -16,7 +17,10 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -26,12 +30,14 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
+@EnableMethodSecurity(securedEnabled = true)
 @Slf4j
 @EnableWebSecurity
+@Configuration
 public class SecurityConfig {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -49,24 +55,42 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy());
-
-        return (web) -> web.debug(true).expressionHandler(expressionHandler);
+        return (web) -> web.debug(true);
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public AuthorizationManager<RequestAuthorizationContext> authorizationManager_READ(RoleHierarchy roleHierarchy) {
+        return (authentication, object) -> {
+            var authorityAuthorizationManager = AuthorityAuthorizationManager.hasRole("READ");
+            authorityAuthorizationManager.setRoleHierarchy(roleHierarchy);
 
+            return authorityAuthorizationManager.check(authentication, object);
+        };
+    }
+
+    @Bean
+    public AuthorizationManager<RequestAuthorizationContext> authorizationManager_EDIT(RoleHierarchy roleHierarchy) {
+        return (authentication, object) -> {
+            var authorityAuthorizationManager = AuthorityAuthorizationManager.hasRole("EDIT");
+            authorityAuthorizationManager.setRoleHierarchy(roleHierarchy);
+
+            return authorityAuthorizationManager.check(authentication, object);
+        };
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           AuthorizationManager<RequestAuthorizationContext> authorizationManager_READ,
+                                           AuthorizationManager<RequestAuthorizationContext> authorizationManager_EDIT) throws Exception {
 
         return http.csrf().disable()
                 .formLogin().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api", "/favicon.ico").permitAll()
-                .requestMatchers(HttpMethod.POST, "/internal-order/**").hasRole("EDIT")
-                .requestMatchers(HttpMethod.DELETE, "/internal-order/**").hasRole("EDIT")
-                .requestMatchers(HttpMethod.GET, "/internal-order/update-status").hasRole("EDIT")
-                .requestMatchers(HttpMethod.GET, "/internal-order/**").hasRole("READ")
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**", "/api", "/favicon.ico").permitAll()
+                .requestMatchers(HttpMethod.POST, "/internal-order/**").access(authorizationManager_EDIT)
+                .requestMatchers(HttpMethod.DELETE, "/internal-order/**").access(authorizationManager_EDIT)
+                .requestMatchers(HttpMethod.GET, "/internal-order/update-status").access(authorizationManager_EDIT)
+                .requestMatchers(HttpMethod.GET, "/internal-order/**").access(authorizationManager_READ)
                 .anyRequest().denyAll()
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -95,7 +119,7 @@ public class SecurityConfig {
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 
-//    @Bean
+    @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 

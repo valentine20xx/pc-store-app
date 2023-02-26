@@ -26,28 +26,6 @@ spring:
     activate:
       on-profile: local
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri:
-
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          keycloak:
-#            client-id: login-app
-#            authorization-grant-type: authorization_code
-#            scope: openid
-#        provider:
-#          keycloak:
-#            issuer-uri: http://localhost:8180/auth/realms/SpringBootKeycloak
-#            user-name-attribute: preferred_username
-
-
-
-
 logging:
   level:
     root: debug

@@ -17,3 +17,5 @@ springdoc:
     path: /api
 #    oauth:
 #      app-name:
+
+jwk-set-uri: http://localhost:8180/realms/master/protocol/openid-connect/certs

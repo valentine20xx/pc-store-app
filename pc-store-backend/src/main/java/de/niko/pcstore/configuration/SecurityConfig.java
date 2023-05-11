@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -27,8 +29,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -61,6 +65,9 @@ public class SecurityConfig {
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> authorizationManager_READ(RoleHierarchy roleHierarchy) {
         return (authentication, object) -> {
+
+            Jwt jwtToken = ((JwtAuthenticationToken) authentication.get()).getToken();
+// Check token session
             var authorityAuthorizationManager = AuthorityAuthorizationManager.hasRole("READ");
             authorityAuthorizationManager.setRoleHierarchy(roleHierarchy);
 
@@ -113,9 +120,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
-        String jwkSetUri = "http://localhost:8180/realms/master/protocol/openid-connect/certs";
-
+    public JwtDecoder jwtDecoder(@Value("${jwk-set-uri:}") String jwkSetUri) {
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 
@@ -124,7 +129,7 @@ public class SecurityConfig {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 
         Map<String, List<String>> roleHierarchyMap = new HashMap<>();
-        roleHierarchyMap.put("ROLE_EDIT", Arrays.asList("ROLE_READ"));
+        roleHierarchyMap.put("ROLE_EDIT", List.of("ROLE_READ"));
 
         roleHierarchy.setHierarchy(RoleHierarchyUtils.roleHierarchyFromMap(roleHierarchyMap));
         return roleHierarchy;

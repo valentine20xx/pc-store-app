@@ -72,6 +72,7 @@ Keyclock
 - [x] Springdoc for Spring Boot 3: https://springdoc.org/v2/.
 - [x] Integrate OAuth2 security (Keycloak)
   - [ ] Logout and token invalidate
+  - [ ] Check if the session in a token still active.
   - [ ] Redirect (Code + redirect url) if not authenticated (https://www.predic8.de/oauth2-beispiel.htm 2)
 - [ ] CRON work for archiving.
 - [ ] Swagger: ordering in json objects order.

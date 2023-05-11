@@ -56,7 +56,7 @@ public class SwaggerDocumentationConfig {
         OAuthFlows oAuthFlows = new OAuthFlows();
         OAuthFlow oAuthFlow = new OAuthFlow();
         oAuthFlow.setTokenUrl("http://localhost:8180/realms/master/protocol/openid-connect/token");
-        oAuthFlow.setAuthorizationUrl(" http://localhost:8180/realms/master/protocol/openid-connect/auth");
+        oAuthFlow.setAuthorizationUrl("http://localhost:8180/realms/master/protocol/openid-connect/auth");
         oAuthFlows.setAuthorizationCode(oAuthFlow);
         securityScheme.setFlows(oAuthFlows);
         components.addSecuritySchemes(Tags.SECURITY_SCHEME_NAME, securityScheme);

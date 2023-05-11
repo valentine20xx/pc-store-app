@@ -8,3 +8,5 @@ app:
   archiver:
     scheduling:
       enable: false
+
+jwk-set-uri: http://localhost:8180/realms/master/protocol/openid-connect/certs

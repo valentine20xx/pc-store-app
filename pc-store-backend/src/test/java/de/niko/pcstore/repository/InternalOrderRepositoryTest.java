@@ -2,6 +2,7 @@ package de.niko.pcstore.repository;
 
 import de.niko.pcstore.entity.ClientDataEntity;
 import de.niko.pcstore.entity.InternalOrderEntity;
+import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

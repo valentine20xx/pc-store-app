@@ -9,4 +9,4 @@ app:
     scheduling:
       enable: false
 
-jwk-set-uri: http://localhost:8180/realms/master/protocol/openid-connect/certs
+jwk-set-uri: http://localhost:18080/auth/realms/pc-store/protocol/openid-connect/certs

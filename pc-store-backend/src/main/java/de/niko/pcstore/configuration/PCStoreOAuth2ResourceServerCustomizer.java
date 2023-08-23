@@ -22,43 +22,46 @@ public class PCStoreOAuth2ResourceServerCustomizer implements Customizer<OAuth2R
 
     @Override
     public void customize(OAuth2ResourceServerConfigurer<HttpSecurity> httpSecurityOAuth2ResourceServerConfigurer) {
-        httpSecurityOAuth2ResourceServerConfigurer.jwt(jwtCustomizer -> {
-            JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-            jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-                final Map<String, Object> resource_access = jwt.getClaimAsMap("resource_access");
+        httpSecurityOAuth2ResourceServerConfigurer
+                .jwt(jwtCustomizer -> {
+                    JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+                    jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+                        final Map<String, Object> resource_access = jwt.getClaimAsMap("resource_access");
 
-                log.info("resource_access: " + resource_access);
+                        log.info("resource_access: " + resource_access);
 
-                final Map<String, Object> testClient = (Map<String, Object>) resource_access.get("test-client");
+                        final Map<String, Object> testClient = (Map<String, Object>) resource_access.get("pc-store-backend");
 
-                if (testClient == null) {
-                    return Collections.emptyList();
-                }
-                final List<String> roles = (List<String>) testClient.get("roles");
+                        if (testClient == null) {
+                            return Collections.emptyList();
+                        }
+                        final List<String> roles = (List<String>) testClient.get("roles");
 
-                if (roles == null) {
-                    return Collections.emptyList();
-                }
+                        log.info("User {} has roles: {}", jwt.getSubject(), roles);
 
-                return (roles).stream()
-                        .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-            });
+                        if (roles == null) {
+                            return Collections.emptyList();
+                        }
 
-            jwtCustomizer.jwtAuthenticationConverter(jwtConverter);
-        });
-        httpSecurityOAuth2ResourceServerConfigurer.authenticationEntryPoint((request, response, authException) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+                        return (roles).stream()
+                                .map(roleName -> "ROLE_" + roleName) // prefix to map to a Spring Security "role"
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList());
+                    });
 
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setCode(HttpServletResponse.SC_UNAUTHORIZED);
-            errorDTO.setMessage("No or invalid token");
+                    jwtCustomizer.jwtAuthenticationConverter(jwtConverter);
+                })
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-            String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
+                    ErrorDTO errorDTO = new ErrorDTO();
+                    errorDTO.setCode(HttpServletResponse.SC_UNAUTHORIZED);
+                    errorDTO.setMessage("No or invalid token");
+                   // authException.getMessage()
+                    String errorDTOAsJsonObject = objectMapper.writeValueAsString(errorDTO);
 
-            response.getWriter().write(errorDTOAsJsonObject);
-        });
+                    response.getWriter().write(errorDTOAsJsonObject);
+                });
     }
 }

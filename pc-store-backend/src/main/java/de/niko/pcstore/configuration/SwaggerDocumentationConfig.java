@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 
 @Configuration
 public class SwaggerDocumentationConfig {
@@ -55,8 +56,8 @@ public class SwaggerDocumentationConfig {
         securityScheme.setIn(SecurityScheme.In.HEADER);
         OAuthFlows oAuthFlows = new OAuthFlows();
         OAuthFlow oAuthFlow = new OAuthFlow();
-        oAuthFlow.setTokenUrl("http://localhost:8180/realms/master/protocol/openid-connect/token");
-        oAuthFlow.setAuthorizationUrl("http://localhost:8180/realms/master/protocol/openid-connect/auth");
+        oAuthFlow.setTokenUrl("http://localhost:18080/auth/realms/pc-store/protocol/openid-connect/token");
+        oAuthFlow.setAuthorizationUrl("http://localhost:18080/auth/realms/pc-store/protocol/openid-connect/auth");
         oAuthFlows.setAuthorizationCode(oAuthFlow);
         securityScheme.setFlows(oAuthFlows);
         components.addSecuritySchemes(Tags.SECURITY_SCHEME_NAME, securityScheme);
